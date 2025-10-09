@@ -1,103 +1,192 @@
-import Image from "next/image";
-
+import Map from "./components/Map";
+import { UserSearch, HeartHandshake, PawPrint, Store} from "lucide-react";
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div>
+      {/* hero section */}
+    <section
+                className="relative w-full h-[400px] flex items-center justify-center bg-white bg-center"
+                style={{
+                    backgroundImage:
+                    "url('/images/hero-image.png')", // put your image (dog + cat) in public/images/hero-bg.jpg
+                }}
+                >
+      
+      {/* <div className=" w-full h-[40vh] px-4 bg-white"> */}
+      <div className="flex justify-between m-auto items-center bg-white/40 backdrop-blur-[3px] shadow-md  w-full h-full flex flex-col md:flex-row items-center gap-6">
+        <div className="text-center mx-20 animate-fade-in">
+          <h1 className="text-black text-6xl font-bold">1526</h1>
+          <h1 className="text-black text-xl">Rescues</h1>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div className="text-center mx-20 animate-fade-in delay-200">
+          <h1 className="text-black text-6xl font-bold">2596</h1>
+          <h1 className="text-black text-xl">Adoptions</h1>
+        </div>
+        <div className="text-center mx-20 animate-fade-in delay-400">
+          <h1 className="text-black text-6xl font-bold">44575</h1>
+          <h1 className="text-black text-xl">Located</h1>
+        </div>
+      </div>
+    </section>
+
+    {/* main cards */}
+
+    <section className="py-10 bg-red-100">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Responsive grid — 1 column on mobile, 2 on tablets, 4 on desktops */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
+          
+          {/* Card 1 */}
+          <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition duration-300 w-full max-w-xs">
+            <PawPrint className="w-20 h-20 text-black mx-auto mb-4" />
+            <a href="/rescues" className="text-black hover:underline text-lg font-semibold">
+              Report a Rescue
+            </a>
+          </div>
+
+          {/* Card 2 */}
+          <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition duration-300 w-full max-w-xs">
+            <HeartHandshake className="w-20 h-20 text-black mx-auto mb-4" />
+            <a href="/adoptions" className="text-black hover:underline text-lg font-semibold">
+              Adopt a Pet
+            </a>
+          </div>
+
+          {/* Card 3 */}
+          <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition duration-300 w-full max-w-xs">
+            <UserSearch className="w-20 h-20 text-black mx-auto mb-4" />
+            <a href="/lost-found" className="text-black hover:underline text-lg font-semibold">
+              Lost & Found
+            </a>
+          </div>
+
+          {/* Card 4 */}
+          <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition duration-300 w-full max-w-xs">
+            <Store className="w-20 h-20 text-black mx-auto mb-4" />
+            <a href="/store" className="text-black hover:underline text-lg font-semibold">
+              Store
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <section>
+      {/* <h1 className="bg-green-100 text-black pl-15 pt-5">Meet your Purr-fect Match</h1> */}
+      <h1 className="text-black text-2xl font-bold pl-15 pt-5 bg-green-100 m-auto">Purr-fect Stray Locator</h1>
+      <div className="flex flex-wrap justify-center gap-6 p-6 bg-green-100">
+        {/* card 1 */}
+        <div className="relative flex flex-col bg-white shadow-sm border border-slate-200 rounded-lg w-80 h-80 ">
+          <div className="relative h-56 m-2.5 overflow-hidden text-white rounded-md">
+            <img src="https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&w=800&q=80" alt="card-image" />
+          </div>
+          <div className="p-4">
+            <h6 className="mb-2 text-slate-800 text-xl font-semibold">Luna</h6>
+            <p className="text-slate-600 leading-normal font-light">
+              Female | 1 year
+            </p>
+          </div>
+          
+        </div>
+
+
+        {/* card 2 */}
+        <div className="relative flex flex-col bg-white shadow-sm border border-slate-200 rounded-lg w-80 h-80 ">
+          <div className="relative h-56 m-2.5 overflow-hidden text-white rounded-md">
+            <img src="https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&w=800&q=80" alt="card-image" />
+          </div>
+          <div className="p-4">
+            <h6 className="mb-2 text-slate-800 text-xl font-semibold">Luna</h6>
+            <p className="text-slate-600 leading-normal font-light">
+              Female | 1 year
+            </p>
+          </div>
+          
+        </div>
+
+        {/* card 3 */}
+        <div className="relative flex flex-col bg-white shadow-sm border border-slate-200 rounded-lg w-80 h-80 ">
+          <div className="relative h-56 m-2.5 overflow-hidden text-white rounded-md">
+            <img src="https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&w=800&q=80" alt="card-image" />
+          </div>
+          <div className="p-4">
+            <h6 className="mb-2 text-slate-800 text-xl font-semibold">Luna</h6>
+            <p className="text-slate-600 leading-normal font-light">
+              Female | 1 year
+            </p>
+          </div>
+          
+        </div>
+
+        {/* card 4 */}
+        <div className="relative flex flex-col bg-white shadow-sm border border-slate-200 rounded-lg w-80 h-80 ">
+          <div className="relative h-56 m-2.5 overflow-hidden text-white rounded-md">
+            <img src="https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&w=800&q=80" alt="card-image" />
+          </div>
+          <div className="p-4">
+            <h6 className="mb-2 text-slate-800 text-xl font-semibold">Luna</h6>
+            <p className="text-slate-600 leading-normal font-light">
+              Female | 1 year
+            </p>
+          </div>
+          
+        </div>
+
+        
+      </div>
+
+    </section>
+    {/* map and  notifications */}
+    <section className="px-10 bg-green-100">
+      {/* <div className="flex flex-row">
+      
+        <div className="basis-1/2">
+          <h1 className="bg-green-100 text-black pl-15 pt-5">Purr-fect Stray locator</h1>
+        </div>
+        <div className="basis-1/2">
+          <h1 className="bg-green-100 text-black pl-15 pt-5">Rescue Alerts Near you</h1>
+        </div>
+      </div> */}
+
+      <div className="flex flex-row w-full h-[80vh]">
+        
+        {/* Left: Map Section */}
+        <div className="basis-1/2 bg-green-100 p-4">
+          <h1 className="text-black text-2xl font-bold mb-4">Purr-fect Stray Locator</h1>
+          
+          <div id="map" className="w-full h-auto rounded-lg shadow-md">
+            <Map />
+          </div>
+        </div>
+
+        {/* Right: Rescue Alerts Section */}
+        <div className="basis-1/2 bg-green-100 p-4 overflow-y-auto">
+          <h1 className="text-black text-2xl font-bold mb-4">Rescue Alerts Near You</h1>
+          <div className="space-y-4">
+            {[
+              { time: '10 min ago', type: 'Injured dog', status: 'Critical', distance: '2.5 km' },
+              { time: '1 hr ago', type: 'Newborn kitten', status: 'Abandoned', distance: '10 km' },
+              { time: '5 hr ago', type: 'Small Puppy', status: 'Skin Disease', distance: '7 km' },
+              // { time: '6 hr ago', type: 'Stray Cat', status: 'Hungry', distance: '3.2 km' },
+              // { time: '8 hr ago', type: 'Lost Dog', status: 'Wandering', distance: '5.5 km' },
+            ].map((alert, index) => (
+              <div key={index} className="bg-white rounded-lg shadow p-4">
+                <p className="text-sm text-gray-500">🔔 {alert.time}</p>
+                <h2 className="text-lg font-semibold text-gray-800">{alert.type}</h2>
+                <p className="text-sm text-red-600">{alert.status}</p>
+                <p className="text-sm text-gray-600">{alert.distance}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
     </div>
+
+
+    
   );
 }

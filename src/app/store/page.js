@@ -1,49 +1,70 @@
-import { Store } from "lucide-react"
+'use client'
+
+import { ShoppingCart, Store, History } from "lucide-react"
 import ItemCard from "../components/ItemCard"
-export default function Shop(){
-    return(
-        <div>
-             {/* hero section */}
-            <section
-                className="relative w-full h-[400px] flex items-center justify-center bg-white bg-center"
-                style={{
-                    backgroundImage:
-                    "url('/images/hero-image.png')", // put your image (dog + cat) in public/images/hero-bg.jpg
-                }}
+import { CartProvider } from "../components/CartContext"
+import CartModal from "../components/CartModal"
+import OrderHistoryModal from "../components/OrderHistoryModal"
+import { useState } from "react"
+import FullPageLoader from "../components/FullPageLoader" 
+
+export default function Shop() {
+  const [showCart, setShowCart] = useState(false)
+  const [showOrders, setShowOrders] = useState(false)
+  const [pageLoading, setPageLoading] = useState(true)
+  return (
+    <CartProvider>
+      <div className="min-h-screen bg-yellow-50 relative">
+        {pageLoading && <FullPageLoader />}
+        {/* Hero Section */}
+        <section
+          className="relative w-full h-[420px] flex items-center justify-center bg-gradient-to-br from-yellow-100 via-white to-yellow-50"
+          style={{ backgroundImage: "url('/images/hero-image.png')" }}
+        >
+          <div className="bg-white/60 backdrop-blur-md rounded-2xl shadow-xl px-10 py-8 max-w-4xl w-[90%] flex flex-col md:flex-row items-center gap-8 border border-white/40">
+            <div className="flex-shrink-0">
+              <Store className="w-24 h-24 text-green-700" />
+            </div>
+
+            <div className="flex flex-col items-center md:items-start text-center md:text-left">
+              <h2 className="text-2xl md:text-3xl font-bold text-green-800 leading-tight">
+                From Collars to Cuddles — We’ve Got It All 🐶
+              </h2>
+              <p className="text-gray-700 mt-3 text-sm md:text-base">
+                Style, Comfort, and Wag — Accessories They’ll Love.<br />
+                For Pets Who Deserve the Best.
+              </p>
+
+              {/* Buttons */}
+              <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
+                <button
+                  onClick={() => setShowCart(true)}
+                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-full transition shadow-md"
                 >
-                {/* Overlay box */}
-                <div className="bg-white/40 backdrop-blur-md rounded-2xl shadow-md px-8 py-6 max-w-3xl w-[90%] flex flex-col md:flex-row items-center gap-6">
-                    {/* Left icon */}
-                    <div className="flex-shrink-0">
-                    <Store className="w-20 h-20 text-black" />
-                    </div>
+                  <ShoppingCart size={18} /> View Cart
+                </button>
 
-                    {/* Text and buttons */}
-                    <div className="flex flex-col items-center md:items-start text-center md:text-left">
-                    <h2 className="text-xl md:text-2xl font-semibold text-black">
-                        From Collars to Cuddles - We've Got It All
-                    </h2>
-                    <p className="text-gray-800 text-sm mt-2">
-                        Style, Comfort, Wag - Accessries They'll Love <br />
-                        For Pets Who Deserve the Best
-                    </p>
+                <button
+                  onClick={() => setShowOrders(true)}
+                  className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-full transition shadow-md"
+                >
+                  <History size={18} /> Order History
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
 
-                    {/* Buttons */}
-                    <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-5">
-                        <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-medium transition">
-                        Add Product
-                        </button>
-                        <button className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-full font-medium transition">
-                        Advanced Search
-                        </button>
-                    </div>
-                    </div>
-                </div>
-            </section>
+        {/* Modals */}
+        {showCart && <CartModal onClose={() => setShowCart(false)} />}
+        {showOrders && <OrderHistoryModal onClose={() => setShowOrders(false)} />}
 
-            <section className="m-auto px-10 bg-yellow-50">
-                <ItemCard />
-            </section>
-        </div>
-    )
+        {/* Product Grid */}
+        <section className="m-auto px-10 py-12 bg-yellow-50">
+          <ItemCard onInitialLoadComplete={() => setPageLoading(false)} />
+        </section>
+
+      </div>
+    </CartProvider>
+  )
 }

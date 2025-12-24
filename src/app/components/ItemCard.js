@@ -1,63 +1,125 @@
-'use client'
+"use client";
 
-const items = [
-  {
-    name: 'Cat Food',
-    price: '750',
-    image: 'https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    name: 'Dog Food',
-    price: '900',
-    image: 'https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    name: 'Dog Treats',
-    price: '300',
-    image: 'https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    name: 'Cat Treats',
-    price: '400',
-    image: 'https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    name: 'Cat Toys',
-    price: '850',
-    image: 'https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    name: 'Dog Toys',
-    price: '950',
-    image: 'https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    name: 'Accessories',
-    price: '500',
-    image: 'https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    name: 'Merchandise',
-    price: '1000',
-    image: 'https://images.unsplash.com/photo-1540553016722-983e48a2cd10?auto=format&fit=crop&w=800&q=80',
-  },
-]
+import { useEffect, useState } from "react";
+import ProductModal from "./ProductModal";
 
-export default function ItemCard() {
+export default function ItemCard({ onInitialLoadComplete }) {
+  const [items, setItems] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const res = await fetch("http://localhost:8000/products/");
+        if (!res.ok) {
+          throw new Error(`Failed to fetch products: ${res.status}`);
+        }
+
+        const data = await res.json();
+        setItems(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Product fetch error:", err);
+        setError("Could not load products. Please try again later.");
+        setItems([]);
+      } finally {
+        setLoading(false);
+        if (typeof onInitialLoadComplete === "function") {
+          onInitialLoadComplete();
+        }
+      }
+    };
+
+    fetchProducts();
+  }, [onInitialLoadComplete]);
+
   return (
     <section className="py-8 px-4 bg-yellow-50">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Missing Paws near you</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {items.map((item, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
-            <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
-            <div className="p-4 text-center">
-              <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
-              <p className="text-sm text-gray-600">Rs.{item.price} upwards</p>              
-            </div>
-          </div>
-        ))}
-      </div>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Our Products
+      </h2>
+
+      {/* Loading / error / empty states */}
+      {loading && items.length === 0 && (
+        <p className="text-center text-gray-600 mb-4">
+          Loading products...
+        </p>
+      )}
+
+      {!loading && error && (
+        <p className="text-center text-red-600 mb-4">{error}</p>
+      )}
+
+      {!loading && !error && items.length === 0 && (
+        <p className="text-center text-gray-500 mb-4">
+          No products available at the moment.
+        </p>
+      )}
+
+      {/* Product grid */}
+      {items.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {items.map((item) => {
+            const outOfStock = item.stock === 0;
+
+            return (
+              <div
+                key={item.id}
+                className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer relative ${
+                  outOfStock ? "opacity-70" : ""
+                }`}
+                onClick={() => setSelected(item)}
+              >
+                {outOfStock && (
+                  <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded">
+                    Out of stock
+                  </span>
+                )}
+
+                <img
+                  src={
+                    item.image_url ||
+                    "https://placehold.co/400x400?text=No+Image"
+                  }
+                  alt={item.name}
+                  className="w-full h-48 object-cover"
+                />
+
+                <div className="p-4 text-center">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {item.name}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Rs.{item.price?.toLocaleString?.() ?? item.price}
+                  </p>
+
+                  {outOfStock ? (
+                    <p className="mt-1 text-xs font-semibold text-red-600">
+                      Out of stock
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-xs text-gray-500">
+                      In stock:{" "}
+                      <span className="font-medium">{item.stock}</span>
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {selected && (
+        <ProductModal
+          product={selected}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </section>
-  )
+  );
 }

@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "./components/Navbar.js"
 import Head from "next/head";
 import Footer from "./components/Footer";
+import ClientLayoutWrapper from "./ClientLayoutWrapper";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,13 +34,8 @@ export default function RootLayout({ children }) {
       </Head> */}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      > 
-      
-        <Navbar />
-        {children}
-      
-      
-      <Footer />
+      >
+        <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
       </body>
     </html>
   );

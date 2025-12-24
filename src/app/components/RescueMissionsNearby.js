@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { MapPin, PawPrint, X } from "lucide-react";
 
-export default function RescueMissions({ missions = [], loading, error, refresh }) {
+export default function RescueMissionsNearby({ missions = [], loading, error, refresh }) {
   const [buttonLoading, setButtonLoading] = useState({});
   const [selectedMission, setSelectedMission] = useState(null);
 
   const API_URL = "http://localhost:8000/rescue-rep/";
 
-  // Start or Join a Rescue
   const startRescue = async (reportId) => {
     const token = localStorage.getItem("access_token");
     if (!token) return alert("Login first");
@@ -22,7 +21,6 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
 
       let chatId = mission.chatId;
 
-      // If no chat exists, create one
       if (!chatId) {
         const chatRes = await fetch("http://localhost:8000/chats/", {
           method: "POST",
@@ -39,19 +37,19 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
         const chatData = await chatRes.json();
         chatId = chatData.chatId;
 
-        // Update report with chat ID + status
+        const updateBody =
+          mission.status === "Pending"
+            ? { chat_id: chatId, status: "InProgress" }
+            : { chat_id: chatId };
+
         const updateRes = await fetch(`${API_URL}${reportId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            chat_id: chatId,
-            status: mission.status === "Pending" ? "InProgress" : mission.status,
-          }),
+          body: JSON.stringify(updateBody),
         });
-
         if (!updateRes.ok) throw new Error("Failed to update report");
       } else if (mission.status === "Pending") {
         const updateRes = await fetch(`${API_URL}${reportId}`, {
@@ -62,10 +60,10 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
           },
           body: JSON.stringify({ status: "InProgress" }),
         });
-        if (!updateRes.ok) throw new Error("Failed to update report");
+        if (!updateRes.ok) throw new Error("Failed to update status");
       }
 
-      await refresh(); // Refresh the parent list immediately
+      await refresh(); // Refresh nearby list
       if (chatId) window.open(`/chats/${chatId}`, "_blank");
     } catch (err) {
       alert(err.message);
@@ -74,17 +72,17 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Loading rescues...</p>;
+  if (loading) return <p className="text-center mt-10">Loading nearby rescues...</p>;
   if (error) return <p className="text-center mt-10 text-red-600">{error}</p>;
 
   return (
     <section className="w-full bg-gray-300 py-10 px-6 md:px-16">
       <h2 className="text-2xl font-semibold text-[#9b6241] mb-8">
-        All Rescue Missions
+        Rescue Missions Near You
       </h2>
 
       {missions.length === 0 ? (
-        <p className="text-gray-700">No rescue missions found.</p>
+        <p className="text-gray-700">No nearby missions found.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
           {missions.map((mission) => (
@@ -92,7 +90,6 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
               key={mission.reportId}
               className="bg-[#c6b29f] rounded-2xl shadow-md p-4 flex flex-col justify-between"
             >
-              {/* Header */}
               <div className="flex justify-between items-center mb-3">
                 <span
                   className={`text-sm font-semibold px-3 py-1 rounded ${
@@ -119,7 +116,6 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
                 </span>
               </div>
 
-              {/* Details */}
               <div className="flex items-start gap-2 text-sm text-black mb-2">
                 <MapPin className="text-red-600 w-4 h-4 flex-shrink-0 mt-0.5" />
                 <span>{mission.location}</span>
@@ -130,7 +126,6 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
                 <span>{mission.description}</span>
               </div>
 
-              {/* Buttons */}
               <div className="flex gap-3 mb-3">
                 <button
                   onClick={() => startRescue(mission.reportId)}

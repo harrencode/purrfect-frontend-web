@@ -246,38 +246,62 @@ export default function LostFound() {
   return (
     <div className="relative">
       {pageLoading && <FullPageLoader />}
-      {/* 🐾 Hero Section */}
-      <section
-        className="relative w-full h-[400px] flex items-center justify-center bg-center"
-        style={{ backgroundImage: "url('/images/hero-image.png')" }}
-      >
-        <div className="bg-white/40 backdrop-blur-md rounded-2xl shadow-md px-8 py-6 max-w-3xl w-[90%] flex flex-col md:flex-row items-center gap-6">
-          <UserSearch className="w-20 h-20 text-black" />
-          <div className="flex flex-col items-center md:items-start text-center md:text-left">
-            <h2 className="text-xl md:text-2xl font-semibold text-black">
-              Lost or Found a Pet? – Help them find their way home
-            </h2>
-            <p className="text-gray-800 text-sm mt-2">
-              Join a community of animal lovers working together to reunite lost
-              pets with their families.
-            </p>
-            <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-5">
-              <button
-                onClick={() => setShowModal(true)}
-                className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-medium transition"
-              >
-                Report Lost Pet
-              </button>
-              <button
-                onClick={() => setShowRadiusModal(true)}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-full font-medium transition flex items-center gap-2"
-              >
-                <Search className="w-4 h-4" /> Nearby Search
-              </button>
+
+      {/* Hero Section*/}
+      <section className="relative w-full min-h-[400px] overflow-hidden flex items-center">
+        {/* Background */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/images/hero-image.png')" }}
+        />
+
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/20" />
+
+        {/* Content */}
+        <div className="relative z-10 w-full px-4 py-10 sm:py-14 md:py-16 flex justify-center">
+          <div className="w-full max-w-5xl bg-white/10 backdrop-blur-lg border border-white/70 rounded-3xl shadow-xl p-6 sm:p-8 md:p-10">
+            <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
+              <UserSearch className="w-16 h-16 sm:w-20 sm:h-20 text-slate-900" />
+
+              <div className="flex flex-col items-center md:items-start text-center md:text-left">
+                <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full inline-block">
+                  Lost & found
+                </p>
+
+                <h2 className="mt-3 text-xl md:text-2xl font-semibold text-emerald-400">
+                  Lost or Found a Pet? – Help them find their way home
+                </h2>
+
+                <p className="text-slate-300 text-sm mt-2 max-w-xl">
+                  Join a community of animal lovers working together to reunite lost pets with their families.
+                </p>
+
+                <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-5">
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-medium transition"
+                  >
+                    Report Lost Pet
+                  </button>
+
+                  <button
+                    onClick={() => setShowRadiusModal(true)}
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-full font-medium transition flex items-center gap-2"
+                  >
+                    <Search className="w-4 h-4" /> Nearby Search
+                  </button>
+                </div>
+              </div>
             </div>
+
+            <p className="mt-6 text-[10px] sm:text-xs text-slate-500 text-center md:text-right">
+              Updated as new reports come in.
+            </p>
           </div>
         </div>
       </section>
+
 
       {/* Nearby Lost Pets */}
       <NearbyLostPets pets={nearby} loading={loadingNearby} />

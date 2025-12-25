@@ -313,40 +313,64 @@ export default function Adopts() {
     <div className="relative">
       {pageLoading && <FullPageLoader />}
       {/* Hero Section */}
-      <section
-        className="relative w-full h-[400px] flex items-center justify-center bg-white bg-center"
-        style={{ backgroundImage: "url('/images/hero-image.png')" }}
-      >
-        <div className="bg-white/40 backdrop-blur-md rounded-2xl shadow-md px-8 py-6 max-w-3xl w-[90%] flex flex-col md:flex-row items-center gap-6">
-          <div className="flex-shrink-0">
-            <PawPrint className="w-20 h-20 text-black" />
-          </div>
-          <div className="flex flex-col items-center md:items-start text-center md:text-left">
-            <h2 className="text-xl md:text-2xl font-semibold text-black">
-              Love, Care, Adopt – One paw at a time
-            </h2>
-            <p className="text-gray-800 text-sm mt-2">
-              Connect with animals in need. Make a difference.
-              <br />
-              AI powered search to find the best match
-            </p>
-            <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-5">
-              <button
-                onClick={() => setShowModal(true)}
-                className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-medium transition"
-              >
-                List for Adoption
-              </button>
-              <button
-                onClick={fetchUserPreferences}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-full font-medium transition"
-              >
-                My Preferences
-              </button>
+      <section className="relative w-full min-h-[400px] overflow-hidden flex items-center">
+        {/* Background */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/images/hero-image.png')" }}
+        />
+
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/20" />
+
+        {/* Content */}
+        <div className="relative z-10 w-full px-4 py-10 sm:py-14 md:py-16 flex justify-center">
+          <div className="w-full max-w-5xl bg-white/10 backdrop-blur-lg border border-white/70 rounded-3xl shadow-xl p-6 sm:p-8 md:p-10">
+            <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
+              <div className="flex-shrink-0">
+                <PawPrint className="w-16 h-16 sm:w-20 sm:h-20 text-slate-900" />
+              </div>
+
+              <div className="flex flex-col items-center md:items-start text-center md:text-left">
+                <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full inline-block">
+                  Adoption hub
+                </p>
+
+                <h2 className="mt-3 text-xl md:text-2xl font-semibold text-emerald-400">
+                  Love, Care, Adopt – One paw at a time
+                </h2>
+
+                <p className="text-slate-300 text-sm mt-2 max-w-xl">
+                  Connect with animals in need. Make a difference.
+                  <br />
+                  AI powered search to find the best match
+                </p>
+
+                <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-5">
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-medium transition"
+                  >
+                    List for Adoption
+                  </button>
+
+                  <button
+                    onClick={fetchUserPreferences}
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-full font-medium transition"
+                  >
+                    My Preferences
+                  </button>
+                </div>
+              </div>
             </div>
+
+            <p className="mt-6 text-[10px] sm:text-xs text-slate-500 text-center md:text-right">
+              Updated with new listings and matches.
+            </p>
           </div>
         </div>
       </section>
+
 
       {/* Recommended Pets */}
       {/* Shared Card Component Rendering */}

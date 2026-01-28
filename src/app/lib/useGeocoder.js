@@ -19,6 +19,7 @@ export async function geocodeAddress(address) {
 
   if (data.status !== "OK" || !data.results || data.results.length === 0) {
     // Provide the raw status for debugging purposes
+    console.error("Geocoding error data:", data);
     throw new Error(`Geocode failed: ${data.status}`);
   }
 

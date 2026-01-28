@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback,useRef } from "react";
 import { UserSearch, Search } from "lucide-react";
 import LostCard from "../components/LostCard";
 import NearbyLostPets from "../components/NearbyLostPets";
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import FullPageLoader from "../components/FullPageLoader"; 
+import { GoogleMap, Marker, useJsApiLoader, Autocomplete } from "@react-google-maps/api";
+
 
 export default function LostFound() {
   const [showModal, setShowModal] = useState(false);
@@ -53,6 +54,7 @@ export default function LostFound() {
   // Load Google Maps
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    libraries: ["places"],
   });
 
   // Convert coordinates to Plus Code (fallback to lat/lon)
@@ -71,6 +73,27 @@ export default function LostFound() {
   // Manual input for location
   const handleLocationChange = (e) => {
     setFormData({ ...formData, location: e.target.value });
+  };
+
+
+
+  const autocompleteRef = useRef(null);
+
+  const handlePlaceChanged = async () => {
+    const place = autocompleteRef.current?.getPlace?.();
+    if (!place?.geometry) return;
+
+    const lat = place.geometry.location.lat();
+    const lon = place.geometry.location.lng();
+    const plusCode = await getPlusCode(lat, lon);
+
+    setFormData((prev) => ({
+      ...prev,
+      latitude: lat,
+      longitude: lon,
+      location: plusCode,
+    }));
+    setMapCenter({ lat, lng: lon });
   };
 
   // Map click handler
@@ -376,7 +399,7 @@ export default function LostFound() {
 
               {/* Location Section */}
               <div>
-                <label className="block text-sm font-medium mb-1">Location</label>
+                {/* <label className="block text-sm font-medium mb-1">Location</label>
                 <input
                   type="text"
                   placeholder="Enter location manually"
@@ -384,15 +407,7 @@ export default function LostFound() {
                   onChange={handleLocationChange}
                   className="w-full border rounded px-3 py-2 mb-2"
                 />
-                <div className="flex gap-3 mb-3">
-                  <button
-                    type="button"
-                    onClick={handleUseCurrentLocation}
-                    className="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded"
-                  >
-                    Use Current Location
-                  </button>
-                </div>
+                 */}
 
                 {isLoaded && (
                   <div className="h-64 w-full border rounded-lg overflow-hidden">
@@ -400,7 +415,7 @@ export default function LostFound() {
                       center={mapCenter}
                       zoom={10}
                       onClick={handleMapClick}
-                      mapContainerStyle={{ width: "100%", height: "100%" }}
+                      mapContainerStyle={{ width: "100%", height: "100%"}}
                     >
                       {formData.latitude && formData.longitude && (
                         <Marker
@@ -413,6 +428,39 @@ export default function LostFound() {
                     </GoogleMap>
                   </div>
                 )}
+
+                {isLoaded ? (
+                  <Autocomplete
+                    onLoad={(ac) => (autocompleteRef.current = ac)}
+                    onPlaceChanged={handlePlaceChanged}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Search location"
+                      value={formData.location}
+                      onChange={handleLocationChange}
+                      className="w-full border rounded px-3 py-2 mb-2"
+                    />
+                  </Autocomplete>
+                ) : (
+                  <input
+                    type="text"
+                    placeholder="Loading Google..."
+                    value={formData.location}
+                    onChange={handleLocationChange}
+                    className="w-full border rounded px-3 py-2 mb-2"
+                  />
+                )}
+                <div className="flex gap-3 mb-3">
+                  <button
+                    type="button"
+                    onClick={handleUseCurrentLocation}
+                    className="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded"
+                  >
+                    Use Current Location
+                  </button>
+                </div>
+
 
                 {formData.latitude && formData.longitude && (
                   <p className="mt-2 text-sm text-gray-600">

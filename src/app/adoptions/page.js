@@ -726,9 +726,9 @@ export default function Adopts() {
                     >
                       <option>Dog</option>
                       <option>Cat</option>
-                      <option>Bird</option>
+                      {/* <option>Bird</option>
                       <option>Rabbit</option>
-                      <option>Other</option>
+                      <option>Other</option> */}
                     </select>
                   </div>
 

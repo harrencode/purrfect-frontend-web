@@ -11,13 +11,22 @@ export default function ClientLayoutWrapper({ children }) {
   const [sessionExpired, setSessionExpired] = useState(false);
 
   const hideLayout =
-    pathname?.startsWith("/signup") || pathname?.startsWith("/signin");
+    pathname?.startsWith("/signup") ||
+    pathname?.startsWith("/signin") ||
+    pathname?.startsWith("/verify-account");
+
+
 
   // Reset session popup on auth pages
   useEffect(() => {
-    if (pathname?.startsWith("/signin") || pathname?.startsWith("/signup")) {
+    if (
+      pathname?.startsWith("/signin") ||
+      pathname?.startsWith("/signup") ||
+      pathname?.startsWith("/verify-account")
+    ) {
       setSessionExpired(false);
     }
+
   }, [pathname]);
 
   useEffect(() => {
@@ -29,10 +38,17 @@ export default function ClientLayoutWrapper({ children }) {
     window.fetch = async (...args) => {
       const res = await originalFetch(...args);
 
+      // Ignore auth endpoints entirely (token, verify, verify-code, resend-code)
+      const url = typeof args[0] === "string" ? args[0] : args[0]?.url || "";
+      const isAuthCall = url.includes("/auth/");
+
+      if (isAuthCall) return res;
+
       if (
         res.status === 401 &&
         !pathname?.startsWith("/signin") &&
-        !pathname?.startsWith("/signup")
+        !pathname?.startsWith("/signup") &&
+        !pathname?.startsWith("/verify-account")
       ) {
         setSessionExpired(true);
       }
@@ -40,11 +56,17 @@ export default function ClientLayoutWrapper({ children }) {
       return res;
     };
 
+
     // On first load (for non-auth pages), verify token explicitly
     const checkSession = async () => {
-      if (pathname?.startsWith("/signin") || pathname?.startsWith("/signup")) {
+      if (
+        pathname?.startsWith("/signin") ||
+        pathname?.startsWith("/signup") ||
+        pathname?.startsWith("/verify-account")
+      ) {
         return;
       }
+
 
       const token = localStorage.getItem("access_token");
 

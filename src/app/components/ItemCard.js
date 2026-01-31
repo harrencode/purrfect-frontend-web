@@ -102,7 +102,7 @@ export default function ItemCard({ onInitialLoadComplete }) {
                       Out of stock
                     </p>
                   ) : (
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-black">
                       In stock:{" "}
                       <span className="font-medium">{item.stock}</span>
                     </p>

@@ -8,6 +8,8 @@ export function middleware(req) {
   if (
     pathname === "/signin" ||
     pathname === "/signup" ||
+    pathname === "/verify-account" ||
+    pathname.startsWith("/verify-account") ||
     pathname.startsWith("/public") ||
     pathname.startsWith("/_next") ||
     pathname.includes(".")

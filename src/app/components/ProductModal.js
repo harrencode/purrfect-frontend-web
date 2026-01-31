@@ -36,7 +36,7 @@ export default function ProductModal({ product, onClose }) {
 
         {/* Stock info */}
         {product.stock !== undefined && (
-          <p className="text-sm mt-1 mb-4">
+          <p className="text-sm mt-1 mb-4 text-gray-600">
             {outOfStock ? (
               <span className="font-semibold text-red-600">Out of stock</span>
             ) : (

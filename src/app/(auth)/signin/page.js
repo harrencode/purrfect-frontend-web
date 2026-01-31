@@ -38,7 +38,6 @@ export default function SignIn() {
     setLoading(true);
 
     try {
-      // Try to get user's location first
       let latitude = null;
       let longitude = null;
 
@@ -49,10 +48,9 @@ export default function SignIn() {
         latitude = position.coords.latitude;
         longitude = position.coords.longitude;
       } catch (geoError) {
-        console.warn("⚠️ Location access denied or unavailable:", geoError.message);
+        console.warn("Location access denied or unavailable:", geoError.message);
       }
 
-      // Send credentials + optional location
       const response = await fetch("http://localhost:8000/auth/token", {
         method: "POST",
         headers: {
@@ -67,17 +65,35 @@ export default function SignIn() {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || "Login failed");
+      console.log("Login response data:", data);
+      console.log("Response status:", response.status);
+      console.log("detail field:", data?.detail?.code);
+      // Redirect if email not verified
+      if (response.status === 403 && data?.detail?.code === "EMAIL_NOT_VERIFIED") {
+        console.log("Email not verified, redirecting to verification page.");
+        router.replace(`/verify-account?email=${encodeURIComponent(data.detail.email || form.email)}`);
+
+        return;
+      }
+
+      if (!response.ok) {
+        const msg =
+          typeof data?.detail === "string"
+            ? data.detail
+            : data?.detail?.code === "ACCOUNT_INACTIVE"
+              ? "Account is inactive."
+              : data?.detail?.code === "EMAIL_NOT_VERIFIED"
+                ? "Email not verified."
+                : "Login failed";
+
+        throw new Error(msg);
+      }
+
 
       if (data?.access_token) {
         localStorage.setItem("access_token", data.access_token);
-        // document.cookie = `access_token=${data.access_token}; path=/; max-age=86400; secure; samesite=strict`;
-        
-        //this is only added for development purpose, add secure in production
         document.cookie = `access_token=${data.access_token}; path=/; max-age=86400; samesite=strict`;
         console.log("Login successful. Token stored.");
-
-        // Redirect to home or dashboard
         router.push("/");
       } else {
         throw new Error("Login failed — token missing");
@@ -93,6 +109,7 @@ export default function SignIn() {
       setLoading(false);
     }
   };
+
 
   return (
     <div

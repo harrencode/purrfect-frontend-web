@@ -1,9 +1,9 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function VerifyAccount() {
+function VerifyAccountInner() {
   const params = useSearchParams();
   const router = useRouter();
 
@@ -99,7 +99,9 @@ export default function VerifyAccount() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-500 p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow p-6">
-        <h1 className="text-2xl font-bold text-center mb-2 text-black">Verify your account</h1>
+        <h1 className="text-2xl font-bold text-center mb-2 text-black">
+          Verify your account
+        </h1>
         <p className="text-center text-gray-600 mb-6">
           Enter the 6-digit code sent to your email.
         </p>
@@ -136,5 +138,13 @@ export default function VerifyAccount() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function VerifyAccount() {
+  return (
+    <Suspense fallback={null}>
+      <VerifyAccountInner />
+    </Suspense>
   );
 }

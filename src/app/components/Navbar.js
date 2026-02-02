@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import NotificationBell from './NotificationBell';
+import Image from "next/image";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -144,7 +145,7 @@ export default function Example() {
           </div>
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex shrink-0 items-center">
-              <img
+              <Image
                 alt="purr-fect"
                 src="/images/Purr-Fect.png"
                 className="h-5 w-auto"
@@ -176,7 +177,7 @@ export default function Example() {
             {/* Profile dropdown */}
             <Menu as="div" className="relative ml-3">
               <MenuButton className="relative flex rounded-full">
-                <img
+                <Image
                   alt="User profile"
                   src={profileImage}
                   className="size-8 rounded-full bg-gray-800 outline -outline-offset-1 outline-white/10 object-cover"

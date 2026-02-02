@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { PawPrint } from "lucide-react";
 import FullPageLoader from "../components/FullPageLoader"; 
+import Image from "next/image";
 
 const API_BASE = "http://localhost:8000";
 
@@ -402,7 +403,7 @@ export default function Adopts() {
               >
                 {/* Pet Image */}
                 <div className="relative h-56 overflow-hidden">
-                  <img
+                  <Image
                     src={
                       safe(req, ["pet", "images", 0]) ||
                       "https://placehold.co/300x300?text=No+Image"
@@ -498,7 +499,7 @@ export default function Adopts() {
                 >
                   {/* Pet Image */}
                   <div className="relative h-56 overflow-hidden">
-                    <img
+                    <Image
                       src={
                         req.pet.images && req.pet.images.length > 0
                           ? req.pet.images[0]
@@ -594,7 +595,7 @@ export default function Adopts() {
               >
                 {/* Pet Image */}
                 <div className="relative h-56 overflow-hidden">
-                  <img
+                  <Image
                     src={
                       req.pet.images && req.pet.images.length > 0
                         ? req.pet.images[0]

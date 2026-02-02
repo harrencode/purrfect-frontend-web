@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+
 
 export default function SignIn() {
   const router = useRouter();
@@ -120,7 +122,7 @@ export default function SignIn() {
 
       <div className="relative z-10 w-full max-w-md bg-white/60 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl p-8 mx-4">
         <div className="text-center mb-6">
-          <img
+          <Image
             alt="Purr-Fect"
             src="/images/Purr-Fect.png"
             className="mx-auto h-12 mb-2 drop-shadow-md"

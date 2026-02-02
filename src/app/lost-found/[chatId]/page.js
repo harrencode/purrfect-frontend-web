@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { MapPin, PawPrint, User, Navigation } from "lucide-react";
+import Image from "next/image";
 
 const API_BASE = "http://localhost:8000";
 
@@ -207,7 +208,7 @@ export default function LostPetChatPage() {
         <div className="w-full max-w-3xl bg-white rounded-xl shadow-lg overflow-hidden mb-6 border border-gray-200">
           {/* Image */}
           <div className="relative">
-            <img
+            <Image
               src={lostPetReport.photo || "/images/placeholder.png"}
               alt="Lost Pet"
               className="w-full h-60 object-cover"

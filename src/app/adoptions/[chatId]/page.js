@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { PawPrint, User, ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 const API_BASE = "http://localhost:8000";
 
@@ -221,7 +222,7 @@ export default function AdoptionChatPage() {
         <div className="w-full max-w-3xl bg-white rounded-xl shadow-lg overflow-hidden mb-6 border border-gray-200">
           {/* Image Carousel */}
           <div className="relative">
-            <img
+            <Image
               src={images[currentImgIdx] || "/images/placeholder.png"}
               alt={pet?.name || "Pet"}
               className="w-full h-60 object-cover"

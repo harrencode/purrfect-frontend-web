@@ -7,6 +7,7 @@ import { PawPrint, HeartHandshake, UserSearch, Store, MapPin, PawPrint as Paw } 
 import HeroSection from "./components/HeroSection";
 import Map from "./components/Map";
 import FullPageLoader from "./components/FullPageLoader";
+import Image from "next/image";
 
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -395,7 +396,7 @@ export default function Home() {
               >
                 {/* Pet Image */}
                 <div className="relative h-56 overflow-hidden">
-                  <img
+                  <Image
                     src={
                       safe(req, ["pet", "images", 0]) ||
                       "https://placehold.co/300x300?text=No+Image"

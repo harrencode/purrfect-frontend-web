@@ -1,6 +1,7 @@
 'use client'
 
 import { useCart } from "./CartContext"
+import Image from "next/image";
 
 export default function ProductModal({ product, onClose }) {
   const { addToCart } = useCart()
@@ -16,7 +17,7 @@ export default function ProductModal({ product, onClose }) {
           ✕
         </button>
 
-        <img
+        <Image
           src={product.image_url || "https://placehold.co/400x400?text=No+Image"}
           alt={product.name}
           className="w-full h-60 object-cover rounded-lg mb-4"

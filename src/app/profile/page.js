@@ -9,6 +9,7 @@ import {
   Loader2,
   Lock,
 } from "lucide-react";
+import Image from "next/image";
 
 const API_BASE_URL = "http://localhost:8000"; 
 
@@ -217,7 +218,7 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <>
-                  <img
+                  <Image
                     src={user?.profile_photo_url}
                     alt="Profile"
                     className="h-16 w-16 rounded-full object-cover border border-white shadow-sm"

@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+
 
 export default function Signup() {
   const router = useRouter();
@@ -120,7 +122,7 @@ export default function Signup() {
       <div className="relative z-10 w-full max-w-4xl bg-white/60 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl p-6 md:p-8 overflow-y-auto max-h-[90vh]">
         {/* Header */}
         <div className="text-center mb-4">
-          <img
+          <Image
             alt="Purr-Fect"
             src="/images/Purr-Fect.png"
             className="mx-auto h-12 mb-2 drop-shadow-md"
@@ -264,7 +266,7 @@ export default function Signup() {
 
           {/* Profile Photo */}
           <div className="mt-2 flex items-center gap-4">
-            <img
+            <Image
               src={preview}
               alt="Profile Preview"
               className="w-16 h-16 rounded-full object-cover border-2 border-teal-400 shadow-sm"

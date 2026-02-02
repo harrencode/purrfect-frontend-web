@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function LostCard() {
   const [pets, setPets] = useState([]);
@@ -84,7 +85,7 @@ export default function LostCard() {
         >
           {/* Pet Image */}
           <div className="relative">
-            <img
+            <Image
               src={pet.photo || PLACEHOLDER_IMAGE}
               alt={pet.pet_name || "Unknown Pet"}
               className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"

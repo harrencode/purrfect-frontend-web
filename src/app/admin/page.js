@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
@@ -474,7 +475,7 @@ export default function AdminDashboardPage() {
                           <td className="px-4 py-2 text-gray-800">
                             <div className="flex items-center gap-2">
                               {u.profile_photo_url && (
-                                <img
+                                <Image
                                   src={u.profile_photo_url}
                                   alt={u.first_name ?? "User avatar"}
                                   className="h-8 w-8 rounded-full object-cover border border-gray-200"

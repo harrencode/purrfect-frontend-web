@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { Trophy, PawPrint, HeartHandshake, Search, MapPin } from "lucide-react";
 import FullPageLoader from "../components/FullPageLoader";
+import Image from "next/image";
 
 export default function Leaderboard() {
   const [leaderboardData, setLeaderboardData] = useState([]);
@@ -179,7 +180,7 @@ export default function Leaderboard() {
       {currentUser && (
         <section className="max-w-7xl mx-auto px-4 py-8">
           <div className="mb-6 bg-white backdrop-blur-lg rounded-lg shadow p-6 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
-            <img
+            <Image
               src={currentUser.avatar || "/images/default-avatar.png"}
               alt={currentUser.full_name}
               className="w-16 h-16 rounded-full object-cover"
@@ -276,7 +277,7 @@ export default function Leaderboard() {
                     {index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <img
+                    <Image
                       src={user.avatar || "/images/default-avatar.png"}
                       alt={user.full_name}
                       className="w-10 h-10 rounded-full object-cover"

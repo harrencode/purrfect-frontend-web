@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ProductModal from "./ProductModal";
+import Image from "next/image";
 
 export default function ItemCard({ onInitialLoadComplete }) {
   const [items, setItems] = useState([]);
@@ -80,7 +81,7 @@ export default function ItemCard({ onInitialLoadComplete }) {
                   </span>
                 )}
 
-                <img
+                <Image
                   src={
                     item.image_url ||
                     "https://placehold.co/400x400?text=No+Image"

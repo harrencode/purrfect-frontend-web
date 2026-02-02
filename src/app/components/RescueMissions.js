@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MapPin, PawPrint, X } from "lucide-react";
+import Image from "next/image";
 
 export default function RescueMissions({ missions = [], loading, error, refresh }) {
   const [buttonLoading, setButtonLoading] = useState({});
@@ -178,7 +179,7 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
             </h3>
 
             {selectedMission.photo && (
-              <img
+              <Image
                 src={
                   selectedMission.photo.startsWith("http")
                     ? selectedMission.photo

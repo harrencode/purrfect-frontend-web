@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 
 export default function NearbyLostPets({ pets, loading }) {
   // Status badge color helper
@@ -52,7 +53,7 @@ export default function NearbyLostPets({ pets, loading }) {
           >
             {/* Pet Photo */}
             <div className="relative">
-              <img
+              <Image
                 src={pet.photo || "/images/default-pet.png"}
                 alt={pet.pet_name || "Lost Pet"}
                 className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"

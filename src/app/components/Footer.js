@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Facebook, MessageCircle } from "lucide-react";
 
 export default function Footer() {
@@ -15,15 +16,15 @@ export default function Footer() {
 
         {/* Middle Links */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-2 text-center md:text-left">
-          <a href="/rescues" className="hover:text-gray-300">Rescue Section</a>
-          <a href="/map" className="hover:text-gray-300">Stray Map</a>
-          <a href="/store" className="hover:text-gray-300">Store</a>
-          <a href="/adoptions" className="hover:text-gray-300">Adopt Section</a>
-          <a href="/leaderboard" className="hover:text-gray-300">Leaderboard</a>
-          <a href="/lost-found" className="hover:text-gray-300">Lost & Found</a>
+          <Link href="/rescues" className="hover:text-gray-300">Rescue Section</Link>
+          <Link href="/map" className="hover:text-gray-300">Stray Map</Link>
+          <Link href="/store" className="hover:text-gray-300">Store</Link>
+          <Link href="/adoptions" className="hover:text-gray-300">Adopt Section</Link>
+          <Link href="/leaderboard" className="hover:text-gray-300">Leaderboard</Link>
+          <Link href="/lost-found" className="hover:text-gray-300">Lost &amp; Found</Link>
         </div>
 
-        {/* Social Icons */}
+        {/* Social Icons (external links are fine as <a>) */}
         <div className="flex items-center gap-4">
           <a
             href="https://facebook.com"

@@ -9,6 +9,7 @@ import {
 } from "@react-google-maps/api";
 
 export default function RescueReportForm({ onClose, onSubmit }) {
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
   const [location, setLocation] = useState(""); // Plus Code
   const [coords, setCoords] = useState({ lat: null, lon: null });
   const [description, setDescription] = useState("");
@@ -94,7 +95,7 @@ export default function RescueReportForm({ onClose, onSubmit }) {
 
       try {
         const token = localStorage.getItem("access_token");
-        const res = await fetch("http://localhost:8000/rescue-rep/upload-s3", {
+        const res = await fetch(`${API_BASE}/rescue-rep/upload-s3`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: formData,

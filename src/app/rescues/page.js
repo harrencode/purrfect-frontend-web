@@ -30,7 +30,8 @@ export default function Rescues() {
 
   const pageLoading = loadingMissions || loadingNearby;
 
-  const API_URL = "http://localhost:8000/rescue-rep/";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+  const API_URL = `${API_BASE}/rescue-rep/`;
   // const token =
   //   typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 

@@ -6,6 +6,8 @@ import { Trophy, PawPrint, HeartHandshake, Search, MapPin } from "lucide-react";
 import FullPageLoader from "../components/FullPageLoader";
 import Image from "next/image";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
 export default function Leaderboard() {
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [currentUserName, setCurrentUserName] = useState("");
@@ -31,7 +33,7 @@ export default function Leaderboard() {
       }
 
       try {
-        const res = await fetch("http://localhost:8000/users/me", {
+        const res = await fetch(`${API_BASE}/users/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -62,7 +64,7 @@ export default function Leaderboard() {
         setLoadingLeaderboard(true);
         setError(null);
 
-        const res = await fetch("http://localhost:8000/leaderboard/");
+        const res = await fetch(`${API_BASE}/leaderboard/`);
         if (!res.ok) throw new Error("Failed to fetch leaderboard");
 
         const data = await res.json();

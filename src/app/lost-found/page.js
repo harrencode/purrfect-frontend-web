@@ -37,7 +37,7 @@ export default function LostFound() {
 
   const [mapCenter, setMapCenter] = useState({ lat: 6.9271, lng: 79.8612 }); // Default: Colombo
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
   const API_URL = `${API_BASE}/lost-found/`;
   const S3_UPLOAD_URL =
   process.env.NEXT_PUBLIC_S3_UPLOAD_URL ||

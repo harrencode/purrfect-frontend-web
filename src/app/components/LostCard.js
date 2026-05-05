@@ -7,7 +7,7 @@ export default function LostCard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
   const API_URL = `${API_BASE}/lost-found/`;
   const PLACEHOLDER_IMAGE = "/images/default-pet.png";
 

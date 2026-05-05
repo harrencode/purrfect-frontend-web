@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react"
 import { XCircle } from "lucide-react"
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL
+
 export default function OrderHistoryModal({ onClose }) {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -11,7 +13,7 @@ export default function OrderHistoryModal({ onClose }) {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch("http://localhost:8000/cart/recent")
+        const res = await fetch(`${API_BASE}/cart/recent`)
         if (!res.ok) throw new Error(`HTTP ${res.status} - Failed to fetch orders`)
         const data = await res.json()
 

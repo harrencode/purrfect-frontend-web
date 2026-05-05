@@ -4,6 +4,8 @@ import { useState } from "react"
 import { useCart } from "./CartContext"
 import { Trash2, Plus, Minus } from "lucide-react"
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL
+
 export default function CartModal({ onClose }) {
   const { cart, removeFromCart, clearCart } = useCart()
   const [loading, setLoading] = useState(false)
@@ -32,7 +34,7 @@ export default function CartModal({ onClose }) {
   const handleCheckout = async () => {
     setLoading(true)
     try {
-      const res = await fetch("http://localhost:8000/cart/checkout", {
+      const res = await fetch(`${API_BASE}/cart/checkout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

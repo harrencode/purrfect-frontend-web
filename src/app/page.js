@@ -10,8 +10,7 @@ import FullPageLoader from "./components/FullPageLoader";
 import Image from "next/image";
 
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-// const RESCUE_API = "http://localhost:8000/rescue-rep/";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 const RESCUE_API = `${API_BASE}/rescue-rep/`;
 
 export default function Home() {

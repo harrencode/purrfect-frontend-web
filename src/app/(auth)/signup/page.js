@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Signup() {
   const router = useRouter();
@@ -91,7 +92,7 @@ export default function Signup() {
       });
       if (profilePhoto) data.append("profile_photo", profilePhoto);
 
-      const response = await fetch("http://localhost:8000/auth/", {
+      const response = await fetch(`${API_BASE}/auth/`, {
         method: "POST",
         body: data,
       });

@@ -9,6 +9,8 @@ import { useEffect, useState } from 'react';
 import NotificationBell from './NotificationBell';
 import Image from "next/image";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
@@ -50,7 +52,7 @@ export default function Example() {
         const token = Cookies.get("access_token");
         if (!token) return;
 
-        const response = await fetch("http://localhost:8000/users/me", {
+        const response = await fetch(`${API_BASE}/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -90,7 +92,7 @@ export default function Example() {
           formData.append("latitude", latitude.toString());
           formData.append("longitude", longitude.toString());
 
-          const res = await fetch("http://localhost:8000/notifications/nearby", {
+          const res = await fetch(`${API_BASE}/notifications/nearby`, {
             method: "POST",
             headers: {
               Authorization: `Bearer ${token}`,

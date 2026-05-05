@@ -8,7 +8,8 @@ export default function RescueMissionsNearby({ missions = [], loading, error, re
   const [buttonLoading, setButtonLoading] = useState({});
   const [selectedMission, setSelectedMission] = useState(null);
 
-  const API_URL = "http://localhost:8000/rescue-rep/";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+  const API_URL = `${API_BASE}/rescue-rep/`;
 
   const startRescue = async (reportId) => {
     const token = localStorage.getItem("access_token");
@@ -23,7 +24,7 @@ export default function RescueMissionsNearby({ missions = [], loading, error, re
       let chatId = mission.chatId;
 
       if (!chatId) {
-        const chatRes = await fetch("http://localhost:8000/chats/", {
+        const chatRes = await fetch(`${API_BASE}/chats/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -178,7 +179,7 @@ export default function RescueMissionsNearby({ missions = [], loading, error, re
                 src={
                   selectedMission.photo.startsWith("http")
                     ? selectedMission.photo
-                    : `http://localhost:8000${selectedMission.photo}`
+                    : `${API_BASE}${selectedMission.photo}`
                 }
                 alt="Rescue mission"
                 className="w-full h-64 object-cover rounded-lg mb-4"

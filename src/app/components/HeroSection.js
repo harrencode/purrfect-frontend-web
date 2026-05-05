@@ -61,9 +61,6 @@
 //     setError(null);
 
 //     try {
-//       const baseUrl =
-//         process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-
 //       const res = await fetch(`${baseUrl}/api/stats`, {
 //         headers: { Accept: "application/json" },
 //         cache: "no-store",
@@ -242,7 +239,7 @@ export default function HeroSection() {
 
     try {
       const baseUrl =
-        process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+        process.env.NEXT_PUBLIC_API_URL;
 
       const res = await fetch(`${baseUrl}/api/stats`, {
         headers: { Accept: "application/json" },

@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { PawPrint, User, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 function decodeJwt(token) {
   try {

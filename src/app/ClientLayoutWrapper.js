@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
 export default function ClientLayoutWrapper({ children }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -76,7 +78,7 @@ export default function ClientLayoutWrapper({ children }) {
       }
 
       try {
-        const res = await originalFetch("http://localhost:8000/auth/verify", {
+        const res = await originalFetch(`${API_BASE}/auth/verify`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,

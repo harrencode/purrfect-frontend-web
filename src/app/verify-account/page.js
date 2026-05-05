@@ -3,6 +3,8 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
 function VerifyAccountInner() {
   const params = useSearchParams();
   const router = useRouter();
@@ -29,7 +31,7 @@ function VerifyAccountInner() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/auth/verify-code", {
+      const res = await fetch(`${API_BASE}/auth/verify-code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code }),
@@ -68,7 +70,7 @@ function VerifyAccountInner() {
     setResending(true);
 
     try {
-      const res = await fetch("http://localhost:8000/auth/resend-code", {
+      const res = await fetch(`${API_BASE}/auth/resend-code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

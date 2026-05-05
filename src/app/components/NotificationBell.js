@@ -5,6 +5,8 @@ import { BellIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -20,7 +22,7 @@ export default function NotificationBell() {
         const token = Cookies.get("access_token");
         if (!token) return;
 
-        const res = await fetch("http://localhost:8000/notifications/", {
+        const res = await fetch(`${API_BASE}/notifications/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to fetch notifications");
@@ -58,7 +60,7 @@ export default function NotificationBell() {
     try {
       const token = Cookies.get("access_token");
       await fetch(
-        `http://localhost:8000/notifications/${notif.notif_id}/viewed`,
+        `${API_BASE}/notifications/${notif.notif_id}/viewed`,
         {
           method: "PATCH",
           headers: {

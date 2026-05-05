@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import ProductModal from "./ProductModal";
 import Image from "next/image";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
 export default function ItemCard({ onInitialLoadComplete }) {
   const [items, setItems] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -16,7 +18,7 @@ export default function ItemCard({ onInitialLoadComplete }) {
         setLoading(true);
         setError("");
 
-        const res = await fetch("http://localhost:8000/products/");
+        const res = await fetch(`${API_BASE}/products/`);
         if (!res.ok) {
           throw new Error(`Failed to fetch products: ${res.status}`);
         }

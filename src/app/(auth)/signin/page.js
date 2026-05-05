@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default function SignIn() {
   const router = useRouter();
@@ -53,7 +54,7 @@ export default function SignIn() {
         console.warn("Location access denied or unavailable:", geoError.message);
       }
 
-      const response = await fetch("http://localhost:8000/auth/token", {
+      const response = await fetch(`${API_BASE}/auth/token`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",

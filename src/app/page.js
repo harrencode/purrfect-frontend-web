@@ -328,7 +328,7 @@ export default function Home() {
       <HeroSection />
 
       {/* Main Navigation Cards */}
-      <section className="py-10 bg-red-100">
+      <section className="py-10 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
             {[
@@ -357,8 +357,8 @@ export default function Home() {
       {/* AI Recommended Pets  */}
       {/* EVERYTHING BELOW HERE IS UNCHANGED UNTIL ALERTS SECTION*/}
 
-      <section>
-        <h1 className="bg-orange-100 text-black text-center text-2xl font-semibold py-5">
+      <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
+        <h1 className="text-slate-900 text-center text-2xl font-semibold py-5 border-b border-amber-200/60">
           AI Recommended Pets for You
         </h1>
 
@@ -368,11 +368,22 @@ export default function Home() {
           </p>
         )}
 
-        <div className="flex flex-wrap justify-center gap-6 p-6 bg-orange-100">
+        <div className="flex flex-wrap justify-center gap-6 p-6">
           {!loadingRecs && recommendedPets.length === 0 && (
-            <p className="text-gray-500 text-sm">
-              No recommendations available yet.
-            </p>
+            <div className="w-full max-w-2xl rounded-2xl border border-amber-200 bg-white/70 p-6 text-center shadow-sm">
+              <p className="text-base font-semibold text-gray-800">
+                No recommendations yet
+              </p>
+              <p className="mt-1 text-sm text-gray-600">
+                Update your preferences to get better matches.
+              </p>
+              <a
+                href="/profile"
+                className="mt-3 inline-flex items-center justify-center rounded-full bg-amber-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-500"
+              >
+                Update preferences
+              </a>
+            </div>
           )}
 
           {recommendedPets.map((pet) => {
@@ -401,6 +412,8 @@ export default function Home() {
                       "https://placehold.co/300x300?text=No+Image"
                     }
                     alt={safe(req, ["pet", "name"], "Unknown")}
+                    width={320}
+                    height={224}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                   <div className="absolute top-3 left-3 bg-orange-500/90 text-white text-xs font-medium px-3 py-1 rounded-full shadow">
@@ -453,10 +466,10 @@ export default function Home() {
       </section>
 
       {/* Map & Alerts */}
-      <section className="px-10 bg-green-100">
+      <section className="px-10 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
         <div className="flex flex-row w-full h-[80vh]">
           {/* Map */}
-          <div className="basis-1/2 bg-green-100 p-4">
+          <div className="basis-1/2 p-4">
             <h1 className="text-black text-2xl font-bold mb-4">
               Purr-fect Stray Locator
             </h1>
@@ -467,7 +480,7 @@ export default function Home() {
 
           {/* Alerts – now powered by nearby rescue missions */}
           
-          <div className="basis-1/2 bg-green-100 p-4 flex flex-col">
+          <div className="basis-1/2 p-4 flex flex-col">
             <h1 className="text-black text-2xl font-bold mb-4">
               Rescue Alerts Near You
             </h1>
@@ -485,9 +498,14 @@ export default function Home() {
               )}
 
               {!nearbyLoading && !nearbyError && nearbyMissions.length === 0 && (
-                <p className="text-sm text-gray-700">
-                  No rescue alerts near you right now.
-                </p>
+                <div className="rounded-2xl border border-amber-200 bg-white/80 p-5 text-sm text-gray-700 shadow-sm">
+                  <p className="text-base font-semibold text-gray-800">
+                    No rescue alerts nearby
+                  </p>
+                  <p className="mt-1 text-sm text-gray-600">
+                    Check back soon or open the map to explore other areas.
+                  </p>
+                </div>
               )}
 
               <div className="space-y-4">

@@ -80,7 +80,7 @@ export default function StrayMap() {
         </div>
       </section>
 
-      <div className="flex justify-center gap-4 pt-8 pb-4 bg-green-50">
+      <div className="flex justify-center gap-4 pt-8 pb-4 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
         <button
           onClick={() => setSelectedType('')}
           className={`px-4 py-2 rounded-full font-medium transition ${
@@ -124,7 +124,7 @@ export default function StrayMap() {
       </div>
 
        {/* Map */}
-      <section className="relative">
+      <section className="relative bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
         {/* let the map tell us when it’s done loading */}
         <FullMap
           selectedType={selectedType}

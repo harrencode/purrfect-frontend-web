@@ -225,6 +225,8 @@ export default function AdoptionChatPage() {
             <Image
               src={images[currentImgIdx] || "/images/placeholder.png"}
               alt={pet?.name || "Pet"}
+              width={768}
+              height={240}
               className="w-full h-60 object-cover"
               onError={(e) => {
                 e.currentTarget.src = "/images/placeholder.png";
@@ -311,7 +313,14 @@ export default function AdoptionChatPage() {
         className="w-full max-w-3xl border rounded-lg h-[500px] overflow-y-auto p-3 bg-white shadow-inner mb-4"
       >
         {messages.length === 0 ? (
-          <p className="text-center text-gray-500 mt-10">No messages yet.</p>
+          <div className="mx-auto mt-10 max-w-md rounded-2xl border border-gray-200 bg-gray-50 p-6 text-center">
+            <p className="text-base font-semibold text-gray-800">
+              No messages yet
+            </p>
+            <p className="mt-1 text-sm text-gray-600">
+              Introduce yourself to get the adoption chat started.
+            </p>
+          </div>
         ) : (
           messages.map((m) => {
             const isSelf =

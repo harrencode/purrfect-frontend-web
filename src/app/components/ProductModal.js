@@ -20,6 +20,8 @@ export default function ProductModal({ product, onClose }) {
         <Image
           src={product.image_url || "https://placehold.co/400x400?text=No+Image"}
           alt={product.name}
+          width={600}
+          height={240}
           className="w-full h-60 object-cover rounded-lg mb-4"
         />
 

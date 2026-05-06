@@ -44,7 +44,7 @@ export default function LostCard() {
     return (
       <div className="py-12 text-center text-gray-500">
         <div className="animate-pulse flex justify-center mb-4">
-          <div className="w-12 h-12 bg-yellow-300 rounded-full" />
+          <div className="w-12 h-12 bg-amber-300 rounded-full" />
         </div>
         <p className="text-lg font-medium">Loading lost pets...</p>
       </div>
@@ -55,9 +55,20 @@ export default function LostCard() {
 
   if (!pets.length)
     return (
-      <p className="text-center text-gray-500 py-8">
-        No lost or found pets reported yet.
-      </p>
+      <div className="mx-auto my-8 w-full max-w-2xl rounded-2xl border border-amber-200 bg-white/80 p-6 text-center shadow-sm">
+        <p className="text-base font-semibold text-gray-800">
+          No reports yet
+        </p>
+        <p className="mt-1 text-sm text-gray-600">
+          Be the first to report a lost or found pet.
+        </p>
+        <a
+          href="/lost-found"
+          className="mt-3 inline-flex items-center justify-center rounded-full bg-amber-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-500"
+        >
+          Create a report
+        </a>
+      </div>
     );
 
   // Helper function for status badge color
@@ -81,13 +92,15 @@ export default function LostCard() {
       {pets.map((pet, i) => (
         <div
           key={pet.reportId || i}
-          className="group relative bg-white rounded-2xl border border-yellow-200 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+          className="group relative bg-white rounded-2xl border border-amber-200 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
         >
           {/* Pet Image */}
           <div className="relative">
             <Image
               src={pet.photo || PLACEHOLDER_IMAGE}
               alt={pet.pet_name || "Unknown Pet"}
+              width={400}
+              height={192}
               className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
             />
 

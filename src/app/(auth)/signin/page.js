@@ -126,6 +126,8 @@ export default function SignIn() {
           <Image
             alt="Purr-Fect"
             src="/images/Purr-Fect.png"
+            width={160}
+            height={48}
             className="mx-auto h-12 mb-2 drop-shadow-md"
           />
           <h2 className="text-3xl font-extrabold text-teal-700">Welcome Back!</h2>

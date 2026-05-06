@@ -66,7 +66,20 @@ export default function OrderHistoryModal({ onClose }) {
         ) : error ? (
           <p className="text-center text-red-600">{error}</p>
         ) : orders.length === 0 ? (
-          <p className="text-center text-gray-500">No recent orders found.</p>
+          <div className="rounded-2xl border border-gray-200 bg-white/90 p-5 text-center shadow-sm">
+            <p className="text-base font-semibold text-gray-800">
+              No recent orders
+            </p>
+            <p className="mt-1 text-sm text-gray-600">
+              Your order history will appear here after checkout.
+            </p>
+            <a
+              href="/store"
+              className="mt-3 inline-flex items-center justify-center rounded-full bg-green-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-green-500"
+            >
+              Browse the store
+            </a>
+          </div>
         ) : (
           <ul className="space-y-4">
             {orders.map((order) => (

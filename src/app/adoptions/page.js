@@ -375,14 +375,30 @@ export default function Adopts() {
 
       {/* Recommended Pets */}
       {/* Shared Card Component Rendering */}
-      <section>
-        <h1 className="bg-orange-100 text-black text-center text-2xl font-semibold py-5">
+      <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
+        <h1 className="text-slate-900 text-center text-2xl font-semibold py-5 border-b border-amber-200/60">
           AI Recommended Pets for You
         </h1>
         {loadingRecs && (
           <p className="text-center text-gray-600 mb-4">Refreshing recommendations...</p>
         )}
-        <div className="flex flex-wrap justify-center gap-6 p-6 bg-orange-100">
+        <div className="flex flex-wrap justify-center gap-6 p-6">
+          {!loadingRecs && recommendedPets.length === 0 && (
+            <div className="w-full max-w-2xl rounded-2xl border border-amber-200 bg-white/70 p-6 text-center shadow-sm">
+              <p className="text-base font-semibold text-gray-800">
+                No recommendations yet
+              </p>
+              <p className="mt-1 text-sm text-gray-600">
+                Update your preferences to get better matches.
+              </p>
+              <a
+                href="/profile"
+                className="mt-3 inline-flex items-center justify-center rounded-full bg-amber-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-500"
+              >
+                Update preferences
+              </a>
+            </div>
+          )}
           {recommendedPets.map((pet) => {
             const req = adoptionReqs.find(
               (r) => safe(r, ["pet", "pet_id"], null) === pet.pet_id
@@ -409,6 +425,8 @@ export default function Adopts() {
                       "https://placehold.co/300x300?text=No+Image"
                     }
                     alt={safe(req, ["pet", "name"], "Unknown")}
+                    width={320}
+                    height={224}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
 
@@ -476,13 +494,27 @@ export default function Adopts() {
 
 
       {/* My Adoption Requests */}
-      <section>
-        <h1 className="bg-blue-100 text-black text-center text-2xl font-semibold py-5">
+      <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
+        <h1 className="text-slate-900 text-center text-2xl font-semibold py-5 border-b border-amber-200/60">
           My Adoption Requests
         </h1>
-        <div className="flex flex-wrap justify-center gap-6 p-6 bg-blue-100">
+        <div className="flex flex-wrap justify-center gap-6 p-6">
           {myAdoptionReqs.length === 0 ? (
-            <p className="text-gray-700">You haven’t created any adoption requests yet.</p>
+            <div className="w-full max-w-2xl rounded-2xl border border-amber-200 bg-white/80 p-6 text-center shadow-sm">
+              <p className="text-base font-semibold text-gray-800">
+                No adoption requests yet
+              </p>
+              <p className="mt-1 text-sm text-gray-600">
+                Start by listing a pet for adoption or ask to adopt a match.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowModal(true)}
+                className="mt-3 inline-flex items-center justify-center rounded-full bg-amber-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-500"
+              >
+                List a pet
+              </button>
+            </div>
           ) : (
             myAdoptionReqs.map((req) => {
               const statusColor =
@@ -506,6 +538,8 @@ export default function Adopts() {
                           : "https://placehold.co/300x300?text=No+Image"
                       }
                       alt={req.pet.name || "Unknown"}
+                      width={320}
+                      height={224}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
 
@@ -575,11 +609,27 @@ export default function Adopts() {
 
 
       {/* Meet Your Purr-fect Match */}
-      <section>
-        <h1 className="bg-green-100 text-black text-center text-2xl font-semibold py-5">
+      <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
+        <h1 className="text-slate-900 text-center text-2xl font-semibold py-5 border-b border-amber-200/60">
           Meet your Purr-fect Match
         </h1>
-        <div className="flex flex-wrap justify-center gap-6 p-6 bg-green-100">
+        <div className="flex flex-wrap justify-center gap-6 p-6">
+          {adoptionReqs.length === 0 && (
+            <div className="w-full max-w-2xl rounded-2xl border border-amber-200 bg-white/80 p-6 text-center shadow-sm">
+              <p className="text-base font-semibold text-gray-800">
+                No matches right now
+              </p>
+              <p className="mt-1 text-sm text-gray-600">
+                Check back later or update your preferences for better matches.
+              </p>
+              <a
+                href="/profile"
+                className="mt-3 inline-flex items-center justify-center rounded-full bg-amber-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-500"
+              >
+                Update preferences
+              </a>
+            </div>
+          )}
           {adoptionReqs.map((req) => {
             const statusColor =
               req.status === "Completed"
@@ -602,6 +652,8 @@ export default function Adopts() {
                         : "https://placehold.co/300x300?text=No+Image"
                     }
                     alt={req.pet.name || "Unknown"}
+                    width={320}
+                    height={224}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
 

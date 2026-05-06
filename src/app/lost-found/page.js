@@ -330,7 +330,7 @@ export default function LostFound() {
       <NearbyLostPets pets={nearby} loading={loadingNearby} />
 
       {/* All Lost Pets */}
-      <section className="py-8 m-auto px-10 bg-yellow-50">
+      <section className="py-8 m-auto px-10 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
           🐾 All Missing Pets
         </h2>

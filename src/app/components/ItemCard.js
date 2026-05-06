@@ -41,7 +41,7 @@ export default function ItemCard({ onInitialLoadComplete }) {
   }, [onInitialLoadComplete]);
 
   return (
-    <section className="py-8 px-4 bg-yellow-50">
+    <section className="py-8 px-4 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         Our Products
       </h2>
@@ -58,9 +58,14 @@ export default function ItemCard({ onInitialLoadComplete }) {
       )}
 
       {!loading && !error && items.length === 0 && (
-        <p className="text-center text-gray-500 mb-4">
-          No products available at the moment.
-        </p>
+        <div className="mx-auto mb-4 w-full max-w-xl rounded-2xl border border-yellow-200 bg-white/80 p-6 text-center shadow-sm">
+          <p className="text-base font-semibold text-gray-800">
+            Store is getting restocked
+          </p>
+          <p className="mt-1 text-sm text-gray-600">
+            Please check back soon for new items.
+          </p>
+        </div>
       )}
 
       {/* Product grid */}
@@ -89,6 +94,8 @@ export default function ItemCard({ onInitialLoadComplete }) {
                     "https://placehold.co/400x400?text=No+Image"
                   }
                   alt={item.name}
+                  width={400}
+                  height={192}
                   className="w-full h-48 object-cover"
                 />
 

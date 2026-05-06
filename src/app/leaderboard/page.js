@@ -185,6 +185,8 @@ export default function Leaderboard() {
             <Image
               src={currentUser.avatar || "/images/default-avatar.png"}
               alt={currentUser.full_name}
+              width={64}
+              height={64}
               className="w-16 h-16 rounded-full object-cover"
             />
             <div className="flex flex-col gap-2">
@@ -282,6 +284,8 @@ export default function Leaderboard() {
                     <Image
                       src={user.avatar || "/images/default-avatar.png"}
                       alt={user.full_name}
+                      width={40}
+                      height={40}
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   </td>
@@ -315,7 +319,7 @@ export default function Leaderboard() {
                     colSpan={9}
                     className="px-6 py-6 text-center text-sm text-gray-500"
                   >
-                    No leaderboard data available yet.
+                    No leaderboard data yet. Activity will show up here once users start participating.
                   </td>
                 </tr>
               )}

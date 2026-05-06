@@ -32,6 +32,7 @@ export default function Example() {
   const [user, setUser] = useState(null);
   const [mounted, setMounted] = useState(false);
   const [locationSent, setLocationSent] = useState(false); 
+  const [profileImageError, setProfileImageError] = useState(false);
 
   const handleLogout = () => {
     Cookies.remove('access_token', { path: '/' });
@@ -59,6 +60,7 @@ export default function Example() {
         if (response.ok) {
           const data = await response.json();
           setUser(data);
+          setProfileImageError(false);
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -127,7 +129,9 @@ export default function Example() {
   // Prevent hydration mismatch
   if (!mounted) return null;
 
-  const profileImage = user?.profile_photo_url || "/images/default-avatar.png";
+  const profileImage = profileImageError
+    ? "/images/default-avatar.png"
+    : user?.profile_photo_url || "/images/default-avatar.png";
 
   return (
     <Disclosure
@@ -150,6 +154,8 @@ export default function Example() {
               <Image
                 alt="purr-fect"
                 src="/images/Purr-Fect.png"
+                width={80}
+                height={20}
                 className="h-5 w-auto"
               />
             </div>
@@ -182,6 +188,9 @@ export default function Example() {
                 <Image
                   alt="User profile"
                   src={profileImage}
+                  width={32}
+                  height={32}
+                  onError={() => setProfileImageError(true)}
                   className="size-8 rounded-full bg-gray-800 outline -outline-offset-1 outline-white/10 object-cover"
                 />
               </MenuButton>

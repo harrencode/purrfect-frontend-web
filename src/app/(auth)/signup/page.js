@@ -126,6 +126,8 @@ export default function Signup() {
           <Image
             alt="Purr-Fect"
             src="/images/Purr-Fect.png"
+            width={160}
+            height={48}
             className="mx-auto h-12 mb-2 drop-shadow-md"
           />
           <h2 className="text-3xl font-extrabold text-teal-700">
@@ -270,6 +272,8 @@ export default function Signup() {
             <Image
               src={preview}
               alt="Profile Preview"
+              width={64}
+              height={64}
               className="w-16 h-16 rounded-full object-cover border-2 border-teal-400 shadow-sm"
             />
             <input

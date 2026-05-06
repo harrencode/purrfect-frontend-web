@@ -122,7 +122,12 @@ export default function NotificationBell() {
             )}
 
             {!loading && notifications.length === 0 && (
-              <p className="text-gray-500 text-sm">No notifications yet</p>
+              <div className="rounded-xl border border-gray-700 bg-gray-800/80 p-3 text-center text-sm text-gray-300">
+                <p className="font-semibold text-gray-100">All caught up</p>
+                <p className="mt-1 text-xs text-gray-400">
+                  New alerts will show up here.
+                </p>
+              </div>
             )}
 
             <ul className="divide-y divide-gray-700">

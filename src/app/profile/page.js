@@ -12,6 +12,9 @@ import {
 import Image from "next/image";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL; 
+const PROFILE_UPLOAD_URL =
+  process.env.NEXT_PUBLIC_PROFILE_UPLOAD_URL ||
+  `${API_BASE_URL}/users/upload-s3?folder=profiles`;
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -29,6 +32,13 @@ export default function ProfilePage() {
   const [passwordSuccess, setPasswordSuccess] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState("");
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoSuccess, setPhotoSuccess] = useState("");
+  const [photoError, setPhotoError] = useState("");
+  const [profileImageError, setProfileImageError] = useState(false);
+
   // Preferences form state 
   const [preferences, setPreferences] = useState({
     preferred_species: "any",
@@ -40,14 +50,10 @@ export default function ProfilePage() {
   });
 
   // Get token from your auth (adjust this to your setup)
-  const getAuthHeaders = () => {
+  const getAuthHeaders = (includeJson = true) => {
     const token = localStorage.getItem("access_token");
-    return token
-      ? {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        }
-      : { "Content-Type": "application/json" };
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    return includeJson ? { ...headers, "Content-Type": "application/json" } : headers;
   };
 
   // Load current user on mount
@@ -65,6 +71,8 @@ export default function ProfilePage() {
 
         const data = await res.json();
         setUser(data);
+        setPhotoPreview(data?.profile_photo_url || "");
+        setProfileImageError(false);
 
         // Map backend enum values (likely lower-case strings) into local state
         setPreferences({
@@ -146,6 +154,122 @@ export default function ProfilePage() {
     setPasswordSuccess("");
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    setPhotoFile(file);
+    setPhotoPreview(previewUrl);
+    setProfileImageError(false);
+    setPhotoError("");
+    setPhotoSuccess("");
+  };
+
+  useEffect(() => {
+    if (photoPreview) {
+      setProfileImageError(false);
+    }
+    return () => {
+      if (photoPreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(photoPreview);
+      }
+    };
+  }, [photoPreview]);
+
+  const handlePhotoUpload = async () => {
+    if (!photoFile) {
+      setPhotoError("Please choose a photo first.");
+      return;
+    }
+
+    setPhotoUploading(true);
+    setPhotoError("");
+    setPhotoSuccess("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", photoFile);
+
+      let uploadedUrl = "";
+
+      try {
+        const uploadRes = await fetch(PROFILE_UPLOAD_URL, {
+          method: "POST",
+          headers: getAuthHeaders(false),
+          body: formData,
+        });
+
+        if (!uploadRes.ok) {
+          const errorText = await uploadRes.text().catch(() => "");
+          throw new Error(
+            errorText || "Failed to upload profile image"
+          );
+        }
+
+        const uploadData = await uploadRes.json().catch(() => ({}));
+        uploadedUrl =
+          uploadData.url ||
+          uploadData.file_url ||
+          uploadData.location ||
+          uploadData.profile_photo_url ||
+          "";
+
+        if (!uploadedUrl) {
+          throw new Error("Upload succeeded but no image URL was returned.");
+        }
+      } catch (uploadErr) {
+        // Fallback: attempt direct profile update with multipart form data
+        const directForm = new FormData();
+        directForm.append("profile_photo", photoFile);
+
+        const directRes = await fetch(`${API_BASE_URL}/users/me`, {
+          method: "PUT",
+          headers: getAuthHeaders(false),
+          body: directForm,
+        });
+
+        if (!directRes.ok) {
+          throw uploadErr;
+        }
+
+        const updatedUser = await directRes.json().catch(() => null);
+        if (updatedUser) {
+          setUser(updatedUser);
+          setPhotoPreview(updatedUser?.profile_photo_url || photoPreview);
+          setPhotoFile(null);
+          setPhotoSuccess("Profile photo updated.");
+          return;
+        }
+
+        throw uploadErr;
+      }
+
+      const updateRes = await fetch(`${API_BASE_URL}/users/me`, {
+        method: "PUT",
+        headers: getAuthHeaders(true),
+        body: JSON.stringify({ profile_photo_url: uploadedUrl }),
+      });
+
+      if (!updateRes.ok) {
+        const errData = await updateRes.json().catch(() => ({}));
+        throw new Error(errData.detail || "Failed to update profile photo");
+      }
+
+      const updatedUser = await updateRes.json();
+      setUser(updatedUser);
+      setPhotoPreview(updatedUser?.profile_photo_url || uploadedUrl);
+      setProfileImageError(false);
+      setPhotoFile(null);
+      setPhotoSuccess("Profile photo updated.");
+    } catch (err) {
+      console.error(err);
+      setPhotoError(err.message || "Could not update profile photo.");
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
     setChangingPassword(true);
@@ -219,11 +343,21 @@ export default function ProfilePage() {
               ) : (
                 <>
                   <Image
-                    src={user?.profile_photo_url}
+                    src={
+                      profileImageError
+                        ? "/images/default-avatar.png"
+                        : photoPreview ||
+                          user?.profile_photo_url ||
+                          "/images/default-avatar.png"
+                    }
                     alt="Profile"
+                    width={64}
+                    height={64}
+                    unoptimized={photoPreview?.startsWith("blob:")}
+                    onError={() => setProfileImageError(true)}
                     className="h-16 w-16 rounded-full object-cover border border-white shadow-sm"
                   />
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1 flex-1">
                     <p className="text-sm font-semibold text-slate-900">
                       {user?.first_name} {user?.last_name}
                     </p>
@@ -232,6 +366,34 @@ export default function ProfilePage() {
                       <PawPrint className="h-3 w-3" />
                       <span>Rescue-ready profile</span>
                     </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+                        Change photo
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handlePhotoChange}
+                          className="hidden"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handlePhotoUpload}
+                        disabled={photoUploading || !photoFile}
+                        className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-50"
+                      >
+                        {photoUploading ? "Uploading..." : "Save photo"}
+                      </button>
+                    </div>
+                    {(photoSuccess || photoError) && (
+                      <p
+                        className={`text-xs ${
+                          photoError ? "text-red-600" : "text-emerald-600"
+                        }`}
+                      >
+                        {photoError || photoSuccess}
+                      </p>
+                    )}
                   </div>
                 </>
               )}

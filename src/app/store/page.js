@@ -14,7 +14,7 @@ export default function Shop() {
   const [pageLoading, setPageLoading] = useState(true)
   return (
     <CartProvider>
-      <div className="min-h-screen bg-yellow-50 relative">
+      <div className="min-h-screen relative">
         {pageLoading && <FullPageLoader />}
 
         {/* Hero Section */}
@@ -83,7 +83,7 @@ export default function Shop() {
         {showOrders && <OrderHistoryModal onClose={() => setShowOrders(false)} />}
 
         {/* Product Grid */}
-        <section className="m-auto px-10 py-12 bg-yellow-50">
+        <section className="m-auto px-10 py-12 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
           <ItemCard onInitialLoadComplete={() => setPageLoading(false)} />
         </section>
 

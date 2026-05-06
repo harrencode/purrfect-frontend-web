@@ -439,7 +439,10 @@ export default function AdminDashboardPage() {
               </div>
 
               {users.length === 0 ? (
-                <p className="text-sm text-gray-500">No users found.</p>
+                <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+                  <p className="font-semibold text-gray-800">No users yet</p>
+                  <p className="mt-1">User accounts will appear here once created.</p>
+                </div>
               ) : (
                 <div className="overflow-hidden rounded-lg border border-gray-100">
                   <table className="min-w-full divide-y divide-gray-100 text-sm">
@@ -478,6 +481,8 @@ export default function AdminDashboardPage() {
                                 <Image
                                   src={u.profile_photo_url}
                                   alt={u.first_name ?? "User avatar"}
+                                  width={32}
+                                  height={32}
                                   className="h-8 w-8 rounded-full object-cover border border-gray-200"
                                 />
                               )}
@@ -703,7 +708,10 @@ export default function AdminDashboardPage() {
                   Existing Products
                 </h3>
                 {products.length === 0 ? (
-                  <p className="text-sm text-gray-500">No products found.</p>
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+                    <p className="font-semibold text-gray-800">No products yet</p>
+                    <p className="mt-1">Add your first product using the form above.</p>
+                  </div>
                 ) : (
                   <div className="overflow-hidden rounded-lg border border-gray-100">
                     <table className="min-w-full divide-y divide-gray-100 text-sm">

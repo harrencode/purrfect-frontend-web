@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { HeartHandshake, Search } from "lucide-react";
 import RescueMissions from "../components/RescueMissions";
 import RescueReportForm from "../components/RescueReportForm";
@@ -35,13 +35,16 @@ export default function Rescues() {
   // const token =
   //   typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
-  const getToken = () =>
-  (typeof window !== "undefined" ? localStorage.getItem("access_token") : null);
+  const getToken = useCallback(
+    () =>
+      typeof window !== "undefined" ? localStorage.getItem("access_token") : null,
+    []
+  );
 
   /** Fetch all user rescue reports */
  
 
-  const fetchMissions = async () => {
+  const fetchMissions = useCallback(async () => {
     const token = getToken();
     if (!token) {
       setMissions([]);
@@ -71,14 +74,14 @@ export default function Rescues() {
     } finally {
       setLoadingMissions(false);
     }
-  };
+  }, [API_URL, getToken]);
 
 
   
 
 
   /** Fetch nearby rescue reports based on user location */
-  const fetchNearby = async () => {
+  const fetchNearby = useCallback(async () => {
     const token = getToken();
 
     if (!token) {
@@ -128,7 +131,7 @@ export default function Rescues() {
       },
       { enableHighAccuracy: true }
     );
-  };
+  }, [API_URL, getToken, radius]);
 
 
 
@@ -139,7 +142,7 @@ export default function Rescues() {
   useEffect(() => {
     fetchMissions();
     fetchNearby();
-  }, []);
+  }, [fetchMissions, fetchNearby]);
 
   /** Handle creating a new rescue report */
   const handleCreateRescueReport = async (reportData) => {

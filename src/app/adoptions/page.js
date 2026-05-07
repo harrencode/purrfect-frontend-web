@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { PawPrint } from "lucide-react";
 import FullPageLoader from "../components/FullPageLoader"; 
 import Image from "next/image";
@@ -52,24 +52,27 @@ export default function Adopts() {
   // Fetch Functions
 
 
-  const fetchRecommendedPets = async (top_k = 4) => {
-    if (!token) return;
-    try {
-      setLoadingRecs(true); // show loading
-      const res = await fetch(`${API_BASE}/recommend/?top_k=${top_k}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to fetch recommended pets");
-      const data = await res.json();
-      setRecommendedPets(data.recommendations || []);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingRecs(false); // hide loading
-    }
-  };
+  const fetchRecommendedPets = useCallback(
+    async (top_k = 4) => {
+      if (!token) return;
+      try {
+        setLoadingRecs(true);
+        const res = await fetch(`${API_BASE}/recommend/?top_k=${top_k}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch recommended pets");
+        const data = await res.json();
+        setRecommendedPets(data.recommendations || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingRecs(false);
+      }
+    },
+    [token]
+  );
 
-  const fetchAdoptionReqs = async () => {
+  const fetchAdoptionReqs = useCallback(async () => {
     if (!token) return;
     try {
       const res = await fetch(`${API_BASE}/adoption_reqs/all`, {
@@ -81,10 +84,9 @@ export default function Adopts() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [token]);
 
-
-  const fetchMyAdoptionReqs = async () => {
+  const fetchMyAdoptionReqs = useCallback(async () => {
     if (!token) return;
     try {
       const res = await fetch(`${API_BASE}/adoption_reqs/mine`, {
@@ -96,7 +98,7 @@ export default function Adopts() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [token]);
 
 
   const fetchUserPreferences = async () => {
@@ -147,7 +149,7 @@ export default function Adopts() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [fetchRecommendedPets, fetchAdoptionReqs, fetchMyAdoptionReqs]);
 
 
   

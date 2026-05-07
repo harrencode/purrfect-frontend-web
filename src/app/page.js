@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PawPrint, HeartHandshake, UserSearch, Store, MapPin, PawPrint as Paw } from "lucide-react";
 import HeroSection from "./components/HeroSection";
 import Map from "./components/Map";
@@ -29,8 +29,11 @@ export default function Home() {
   // const token =
   //   typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
-  const getToken = () =>
-  typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  const getToken = useCallback(
+    () =>
+      typeof window !== "undefined" ? localStorage.getItem("access_token") : null,
+    []
+  );
 
 
   //  Safe nested property getter
@@ -38,26 +41,29 @@ export default function Home() {
     path.reduce((a, k) => (a && a[k] != null ? a[k] : fallback), obj);
 
   // Fetch recommended pets
-  const fetchRecommendedPets = async (top_k = 4) => {
-    const token = getToken();
-    if (!token) return;
-    try {
-      setLoadingRecs(true);
-      const res = await fetch(`${API_BASE}/recommend/?top_k=${top_k}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to fetch recommended pets");
-      const data = await res.json();
-      setRecommendedPets(data.recommendations || []);
-    } catch (err) {
-      console.error("Error fetching recommendations:", err);
-    } finally {
-      setLoadingRecs(false);
-    }
-  };
+  const fetchRecommendedPets = useCallback(
+    async (top_k = 4) => {
+      const token = getToken();
+      if (!token) return;
+      try {
+        setLoadingRecs(true);
+        const res = await fetch(`${API_BASE}/recommend/?top_k=${top_k}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch recommended pets");
+        const data = await res.json();
+        setRecommendedPets(data.recommendations || []);
+      } catch (err) {
+        console.error("Error fetching recommendations:", err);
+      } finally {
+        setLoadingRecs(false);
+      }
+    },
+    [getToken]
+  );
 
   // Fetch adoption requests (for linking to recommendation data)
-  const fetchAdoptionReqs = async () => {
+  const fetchAdoptionReqs = useCallback(async () => {
     const token = getToken();
     if (!token) return;
     try {
@@ -70,7 +76,7 @@ export default function Home() {
     } catch (err) {
       console.error("Error fetching adoption requests:", err);
     }
-  };
+  }, [getToken]);
 
   
 
@@ -129,70 +135,73 @@ export default function Home() {
   //   );
   // };
 
-  const fetchNearbyRescues = async (radiusKm = 10) => {
-  const token = getToken();
+  const fetchNearbyRescues = useCallback(
+    async (radiusKm = 10) => {
+      const token = getToken();
 
-  if (!token) {
-    setNearbyLoading(false);
-    setNearbyError("Login to see rescue alerts near you.");
-    setNearbyMissions([]);
-    return;
-  }
-
-  // Skip geolocation if not secure or unavailable
-  if (
-    typeof window === "undefined" ||
-    !window.isSecureContext ||
-    !("geolocation" in navigator)
-  ) {
-    console.warn(
-      "Geolocation not available here (needs HTTPS or localhost). Nearby alerts disabled."
-    );
-    setNearbyLoading(false);
-    setNearbyError(
-      "Location isn't available on this connection. Nearby alerts are disabled."
-    );
-    setNearbyMissions([]);
-    return;
-  }
-
-  setNearbyLoading(true);
-  setNearbyError("");
-
-  navigator.geolocation.getCurrentPosition(
-    async (pos) => {
-      const { latitude, longitude } = pos.coords;
-      try {
-        const res = await fetch(
-          `${RESCUE_API}nearby?lat=${latitude}&lon=${longitude}&radius_km=${radiusKm}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error(`Failed to fetch nearby rescues: ${res.status}`);
-        }
-
-        const data = await res.json();
-        setNearbyMissions(data || []);
-      } catch (err) {
-        console.error(err);
-        setNearbyError("Could not load nearby rescue alerts.");
-        setNearbyMissions([]);
-      } finally {
+      if (!token) {
         setNearbyLoading(false);
+        setNearbyError("Login to see rescue alerts near you.");
+        setNearbyMissions([]);
+        return;
       }
+
+      // Skip geolocation if not secure or unavailable
+      if (
+        typeof window === "undefined" ||
+        !window.isSecureContext ||
+        !("geolocation" in navigator)
+      ) {
+        console.warn(
+          "Geolocation not available here (needs HTTPS or localhost). Nearby alerts disabled."
+        );
+        setNearbyLoading(false);
+        setNearbyError(
+          "Location isn't available on this connection. Nearby alerts are disabled."
+        );
+        setNearbyMissions([]);
+        return;
+      }
+
+      setNearbyLoading(true);
+      setNearbyError("");
+
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          try {
+            const res = await fetch(
+              `${RESCUE_API}nearby?lat=${latitude}&lon=${longitude}&radius_km=${radiusKm}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+
+            if (!res.ok) {
+              throw new Error(`Failed to fetch nearby rescues: ${res.status}`);
+            }
+
+            const data = await res.json();
+            setNearbyMissions(data || []);
+          } catch (err) {
+            console.error(err);
+            setNearbyError("Could not load nearby rescue alerts.");
+            setNearbyMissions([]);
+          } finally {
+            setNearbyLoading(false);
+          }
+        },
+        (err) => {
+          console.warn("Geolocation error:", err?.message ?? err);
+          setNearbyError("Location access denied. Cannot load nearby alerts.");
+          setNearbyMissions([]);
+          setNearbyLoading(false);
+        },
+        { enableHighAccuracy: true }
+      );
     },
-    (err) => {
-      console.warn("Geolocation error:", err?.message ?? err);
-      setNearbyError("Location access denied. Cannot load nearby alerts.");
-      setNearbyMissions([]);
-      setNearbyLoading(false);
-    },
-    { enableHighAccuracy: true }
+    [getToken]
   );
-};
 
 
 
@@ -219,7 +228,7 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [fetchRecommendedPets, fetchAdoptionReqs, fetchNearbyRescues]);
 
 
   // Start/Join rescue chat from Alerts section

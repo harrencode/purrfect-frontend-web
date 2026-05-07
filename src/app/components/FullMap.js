@@ -5,12 +5,12 @@ import { Loader2 } from "lucide-react";
 
 export default function FullMap({ selectedType, onLoaded }) {
   const [map, setMap] = useState(null);
-  const [markers, setMarkers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const mapInitializedRef = useRef(false);
   const markersLoadedRef = useRef(false);
+  const markersRef = useRef([]);
 
   const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/stray-map/`;
 
@@ -63,7 +63,7 @@ export default function FullMap({ selectedType, onLoaded }) {
         if (!Array.isArray(data)) throw new Error("Invalid API response");
 
         // Clear old markers
-        markers.forEach((m) => m.setMap(null));
+        markersRef.current.forEach((m) => m.setMap(null));
 
         // Add new ones
         const newMarkers = data
@@ -111,7 +111,7 @@ export default function FullMap({ selectedType, onLoaded }) {
           })
           .filter(Boolean);
 
-        setMarkers(newMarkers);
+        markersRef.current = newMarkers;
         markersLoadedRef.current = true;
 
         // FIRE onLoaded when markers finish loading
@@ -126,7 +126,7 @@ export default function FullMap({ selectedType, onLoaded }) {
     };
 
     loadMarkers();
-  }, [selectedType, map, onLoaded]);
+  }, [selectedType, map, onLoaded, API_URL]);
 
   return (
     <div className="relative w-full h-[600px] text-black">

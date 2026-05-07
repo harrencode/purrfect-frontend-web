@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   User as UserIcon,
   PawPrint,
@@ -32,12 +32,12 @@ export default function ProfilePage() {
   const [passwordSuccess, setPasswordSuccess] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState("");
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoSuccess, setPhotoSuccess] = useState("");
   const [photoError, setPhotoError] = useState("");
   const [profileImageError, setProfileImageError] = useState(false);
+  const photoInputRef = useRef(null);
 
   // Preferences form state 
   const [preferences, setPreferences] = useState({
@@ -153,16 +153,17 @@ export default function ProfilePage() {
     setPasswordSuccess("");
   };
 
-  const handlePhotoChange = (e) => {
+  const handlePhotoChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const previewUrl = URL.createObjectURL(file);
-    setPhotoFile(file);
     setPhotoPreview(previewUrl);
     setProfileImageError(false);
     setPhotoError("");
     setPhotoSuccess("");
+
+    await uploadProfilePhoto(file, previewUrl);
   };
 
   useEffect(() => {
@@ -176,8 +177,8 @@ export default function ProfilePage() {
     };
   }, [photoPreview]);
 
-  const handlePhotoUpload = async () => {
-    if (!photoFile) {
+  const uploadProfilePhoto = async (file, previewUrl) => {
+    if (!file) {
       setPhotoError("Please choose a photo first.");
       return;
     }
@@ -188,60 +189,29 @@ export default function ProfilePage() {
 
     try {
       const formData = new FormData();
-      formData.append("file", photoFile);
+      formData.append("file", file);
 
-      let uploadedUrl = "";
+      const uploadRes = await fetch(PROFILE_UPLOAD_URL, {
+        method: "POST",
+        headers: getAuthHeaders(false),
+        body: formData,
+      });
 
-      try {
-        const uploadRes = await fetch(PROFILE_UPLOAD_URL, {
-          method: "POST",
-          headers: getAuthHeaders(false),
-          body: formData,
-        });
+      if (!uploadRes.ok) {
+        const errorText = await uploadRes.text().catch(() => "");
+        throw new Error(errorText || "Failed to upload profile image");
+      }
 
-        if (!uploadRes.ok) {
-          const errorText = await uploadRes.text().catch(() => "");
-          throw new Error(
-            errorText || "Failed to upload profile image"
-          );
-        }
+      const uploadData = await uploadRes.json().catch(() => ({}));
+      const uploadedUrl =
+        uploadData.url ||
+        uploadData.file_url ||
+        uploadData.location ||
+        uploadData.profile_photo_url ||
+        "";
 
-        const uploadData = await uploadRes.json().catch(() => ({}));
-        uploadedUrl =
-          uploadData.url ||
-          uploadData.file_url ||
-          uploadData.location ||
-          uploadData.profile_photo_url ||
-          "";
-
-        if (!uploadedUrl) {
-          throw new Error("Upload succeeded but no image URL was returned.");
-        }
-      } catch (uploadErr) {
-        // Fallback: attempt direct profile update with multipart form data
-        const directForm = new FormData();
-        directForm.append("profile_photo", photoFile);
-
-        const directRes = await fetch(`${API_BASE_URL}/users/me`, {
-          method: "PUT",
-          headers: getAuthHeaders(false),
-          body: directForm,
-        });
-
-        if (!directRes.ok) {
-          throw uploadErr;
-        }
-
-        const updatedUser = await directRes.json().catch(() => null);
-        if (updatedUser) {
-          setUser(updatedUser);
-          setPhotoPreview(updatedUser?.profile_photo_url || photoPreview);
-          setPhotoFile(null);
-          setPhotoSuccess("Profile photo updated.");
-          return;
-        }
-
-        throw uploadErr;
+      if (!uploadedUrl) {
+        throw new Error("Upload succeeded but no image URL was returned.");
       }
 
       const updateRes = await fetch(`${API_BASE_URL}/users/me`, {
@@ -259,13 +229,16 @@ export default function ProfilePage() {
       setUser(updatedUser);
       setPhotoPreview(updatedUser?.profile_photo_url || uploadedUrl);
       setProfileImageError(false);
-      setPhotoFile(null);
       setPhotoSuccess("Profile photo updated.");
     } catch (err) {
       console.error(err);
       setPhotoError(err.message || "Could not update profile photo.");
+      setPhotoPreview(user?.profile_photo_url || "");
     } finally {
       setPhotoUploading(false);
+      if (photoInputRef.current) {
+        photoInputRef.current.value = "";
+      }
     }
   };
 
@@ -365,23 +338,24 @@ export default function ProfilePage() {
                       <PawPrint className="h-3 w-3" />
                       <span>Rescue-ready profile</span>
                     </div>
-                    <div className="mt-3 flex flex-wrap items-center gap-2">
-                      <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50">
-                        Change photo
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handlePhotoChange}
-                          className="hidden"
-                        />
-                      </label>
+                    <div className="mt-3">
+                      <input
+                        ref={photoInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoChange}
+                        className="hidden"
+                      />
                       <button
                         type="button"
-                        onClick={handlePhotoUpload}
-                        disabled={photoUploading || !photoFile}
+                        onClick={() => photoInputRef.current?.click()}
+                        disabled={photoUploading}
                         className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-50"
                       >
-                        {photoUploading ? "Uploading..." : "Save photo"}
+                        {photoUploading && (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        )}
+                        <span>{photoUploading ? "Uploading..." : "Change photo"}</span>
                       </button>
                     </div>
                     {(photoSuccess || photoError) && (

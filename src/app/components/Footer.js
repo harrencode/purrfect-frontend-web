@@ -11,7 +11,7 @@ export default function Footer() {
         {/* Left Section */}
         <div className="text-center md:text-left">
           <h1 className="text-2xl font-light">Purr-Fect</h1>
-          <p className="text-sm text-gray-400 mt-1">© 2025 All Rights Reserved</p>
+          <p className="text-sm text-gray-400 mt-1">© 2026 All Rights Reserved</p>
         </div>
 
         {/* Middle Links */}

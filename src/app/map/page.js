@@ -1,23 +1,33 @@
-'use client';
-import { useState } from 'react';
-import { MapPinned } from 'lucide-react';
-import FullMap from '../components/FullMap';
-import FormModal from '../components/FormModal';
-import FullPageLoader from '../components/FullPageLoader'; 
+"use client";
+import { useCallback, useState } from "react";
+import { MapPinned } from "lucide-react";
+import FullMap from "../components/FullMap";
+import FormModal from "../components/FormModal";
+import FullPageLoader from "../components/FullPageLoader";
+import FlashMessage from "../components/FlashMessage";
+import SectionHeading from "../components/SectionHeading";
 
 export default function StrayMap() {
   const [formType, setFormType] = useState(null);
-  const [selectedType, setSelectedType] = useState('');
-  
+  const [selectedType, setSelectedType] = useState("");
+  const [flashMessage, setFlashMessage] = useState("");
+
   const [mapLoading, setMapLoading] = useState(true);
   const pageLoading = mapLoading;
 
   const openForm = (type) => setFormType(type);
   const closeForm = () => setFormType(null);
+  const clearFlash = useCallback(() => setFlashMessage(""), []);
+  const filterOptions = [
+    { label: "All", value: "" },
+    { label: "Rescue Homes", value: "rescue_home" },
+    { label: "Vet Centers", value: "vet_center" },
+    { label: "Stray Animals", value: "stray_animal" },
+  ];
 
   return (
     <div className="relative min-h-screen">
-        {/* Full page loader */}
+      {/* Full page loader */}
       {pageLoading && <FullPageLoader />}
 
       {/* HERO */}
@@ -47,24 +57,25 @@ export default function StrayMap() {
                 </h2>
 
                 <p className="text-slate-300 text-sm mt-2 max-w-xl">
-                  Discover nearby rescue homes, veterinary centers and report stray animals.
+                  Discover nearby rescue homes, veterinary centers and report
+                  stray animals.
                 </p>
 
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-5">
                   <button
-                    onClick={() => openForm('RescueHome')}
+                    onClick={() => openForm("RescueHome")}
                     className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-medium transition"
                   >
                     + Rescue Home
                   </button>
                   <button
-                    onClick={() => openForm('VetCenter')}
+                    onClick={() => openForm("VetCenter")}
                     className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full font-medium transition"
                   >
                     + Vet Center
                   </button>
                   <button
-                    onClick={() => openForm('StrayAnimal')}
+                    onClick={() => openForm("StrayAnimal")}
                     className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-full font-medium transition"
                   >
                     + Stray Animal
@@ -80,50 +91,38 @@ export default function StrayMap() {
         </div>
       </section>
 
-      <div className="flex justify-center gap-4 pt-8 pb-4 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
-        <button
-          onClick={() => setSelectedType('')}
-          className={`px-4 py-2 rounded-full font-medium transition ${
-            selectedType === ''
-              ? 'bg-gray-900 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setSelectedType('rescue_home')}
-          className={`px-4 py-2 rounded-full font-medium transition ${
-            selectedType === 'rescue_home'
-              ? 'bg-green-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`}
-        >
-          Rescue Homes
-        </button>
-        <button
-          onClick={() => setSelectedType('vet_center')}
-          className={`px-4 py-2 rounded-full font-medium transition ${
-            selectedType === 'vet_center'
-              ? 'bg-pink-500 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`}
-        >
-          Vet Centers
-        </button>
-        <button
-          onClick={() => setSelectedType('stray_animal')}
-          className={`px-4 py-2 rounded-full font-medium transition ${
-            selectedType === 'stray_animal'
-              ? 'bg-orange-500 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`}
-        >
-          Stray Animals
-        </button>
-      </div>
+      <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200 px-6 pt-8 pb-5">
+        <SectionHeading
+          eyebrow="Map filters"
+          title="Explore Map Markers"
+          description="Filter the map by rescue homes, veterinary centers, and stray animal reports."
+          align="center"
+          className="mb-5"
+        />
 
-       {/* Map */}
+        <div className="mx-auto flex max-w-7xl flex-wrap justify-center gap-3">
+          {filterOptions.map((option) => {
+            const active = selectedType === option.value;
+
+            return (
+              <button
+                key={option.value || "all"}
+                type="button"
+                onClick={() => setSelectedType(option.value)}
+                className={`inline-flex min-h-11 items-center justify-center rounded-full border px-5 py-2.5 text-sm font-semibold shadow-sm transition ${
+                  active
+                    ? "border-slate-950 bg-slate-950 text-white"
+                    : "border-slate-200 bg-white/80 text-slate-700 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-800"
+                }`}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Map */}
       <section className="relative bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
         {/* let the map tell us when it’s done loading */}
         <FullMap
@@ -132,7 +131,15 @@ export default function StrayMap() {
         />
       </section>
 
-      {formType && <FormModal type={formType} onClose={closeForm} />}
+      <FlashMessage message={flashMessage} onDismiss={clearFlash} />
+
+      {formType && (
+        <FormModal
+          type={formType}
+          onClose={closeForm}
+          onSaved={setFlashMessage}
+        />
+      )}
     </div>
   );
 }

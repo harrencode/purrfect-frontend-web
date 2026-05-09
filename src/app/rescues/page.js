@@ -5,10 +5,12 @@ import RescueMissions from "../components/RescueMissions";
 import RescueReportForm from "../components/RescueReportForm";
 import RescueMissionsNearby from "../components/RescueMissionsNearby";
 import FullPageLoader from "../components/FullPageLoader";
+import FlashMessage from "../components/FlashMessage";
 
 export default function Rescues() {
   const [showForm, setShowForm] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [flashMessage, setFlashMessage] = useState("");
 
   // const [missions, setMissions] = useState([]);
   // const [nearby, setNearby] = useState([]);
@@ -39,6 +41,7 @@ export default function Rescues() {
         : null,
     [],
   );
+  const clearFlash = useCallback(() => setFlashMessage(""), []);
 
   /** Fetch all user rescue reports */
 
@@ -156,8 +159,9 @@ export default function Rescues() {
 
       // Fetch nearby again (in case user’s location is close)
       await fetchNearby();
+      await fetchMissions();
 
-      alert("Rescue report submitted successfully!");
+      setFlashMessage("Rescue report submitted successfully.");
     } catch (err) {
       alert(err.message);
     }
@@ -252,6 +256,8 @@ export default function Rescues() {
         error={errorMissions}
         refresh={fetchMissions}
       />
+
+      <FlashMessage message={flashMessage} onDismiss={clearFlash} />
 
       {/* Rescue Report Modal */}
       {showForm && (

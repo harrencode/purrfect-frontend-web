@@ -6,7 +6,7 @@ import { useCart } from "./CartContext";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-export default function CartModal({ onClose }) {
+export default function CartModal({ onClose, onCheckoutComplete }) {
   const { cart, removeFromCart, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [quantities, setQuantities] = useState(
@@ -46,6 +46,7 @@ export default function CartModal({ onClose }) {
       if (!res.ok) throw new Error("Checkout failed");
       const data = await res.json();
       clearCart();
+      onCheckoutComplete?.();
       window.open(data.whatsapp_url, "_blank");
     } catch (err) {
       alert("Failed " + err.message);

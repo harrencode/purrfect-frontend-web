@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import Script from "next/script";
 import { Loader2 } from "lucide-react";
+import { loadGoogleMaps } from "../lib/googleMaps";
 
 export default function FullMap({ selectedType, onLoaded }) {
   const [map, setMap] = useState(null);
@@ -11,32 +11,46 @@ export default function FullMap({ selectedType, onLoaded }) {
   const mapInitializedRef = useRef(false);
   const markersLoadedRef = useRef(false);
   const markersRef = useRef([]);
+  const mapContainerRef = useRef(null);
 
   const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/stray-map/`;
+  const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-  
-   //INITIALIZE GOOGLE MAP (1 time only)
-   
+  // INITIALIZE GOOGLE MAP (1 time only)
   useEffect(() => {
-    window.initMap = () => {
-      const mapInstance = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 7.8731, lng: 80.7718 },
-        zoom: 8,
+    let mounted = true;
+
+    loadGoogleMaps(GOOGLE_API_KEY)
+      .then((maps) => {
+        if (!mounted || !mapContainerRef.current || mapInitializedRef.current) {
+          return;
+        }
+
+        const mapInstance = new maps.Map(mapContainerRef.current, {
+          center: { lat: 7.8731, lng: 80.7718 },
+          zoom: 8,
+        });
+
+        setMap(mapInstance);
+        mapInitializedRef.current = true;
+
+        // If markers already loaded, fire onLoaded
+        if (markersLoadedRef.current && typeof onLoaded === "function") {
+          onLoaded();
+        }
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        setError(err.message);
+        if (typeof onLoaded === "function") onLoaded();
       });
 
-      setMap(mapInstance);
-      mapInitializedRef.current = true;
-
-      // If markers already loaded, fire onLoaded
-      if (markersLoadedRef.current && typeof onLoaded === "function") {
-        onLoaded();
-      }
+    return () => {
+      mounted = false;
     };
-  }, [onLoaded]);
+  }, [GOOGLE_API_KEY, onLoaded]);
 
-  
-   //LOAD MARKERS ON TYPE CHANGE
-   
+  // LOAD MARKERS ON TYPE CHANGE
   useEffect(() => {
     if (!map) return;
 
@@ -76,15 +90,18 @@ export default function FullMap({ selectedType, onLoaded }) {
             switch (item.location_type) {
               case "rescue_home":
               case "RescueHome":
-                iconUrl = "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+                iconUrl =
+                  "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
                 break;
               case "vet_center":
               case "VetCenter":
-                iconUrl = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+                iconUrl =
+                  "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
                 break;
               case "stray_animal":
               case "StrayAnimal":
-                iconUrl = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+                iconUrl =
+                  "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
                 break;
               default:
                 iconUrl =
@@ -130,14 +147,11 @@ export default function FullMap({ selectedType, onLoaded }) {
 
   return (
     <div className="relative w-full h-[600px] text-black">
-      {/* Google Maps Script */}
-      <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&callback=initMap`}
-        strategy="afterInteractive"
-      />
-
       {/* Map Container */}
-      <div id="map" className="w-full h-full rounded-lg shadow-md" />
+      <div
+        ref={mapContainerRef}
+        className="w-full h-full rounded-lg shadow-md"
+      />
 
       {/* Marker Loader */}
       {loading && (

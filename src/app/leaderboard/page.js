@@ -1,9 +1,9 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { Trophy, PawPrint, HeartHandshake, Search, MapPin } from "lucide-react";
 import FullPageLoader from "../components/FullPageLoader";
+import SectionHeading from "../components/SectionHeading";
 import Image from "next/image";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
@@ -22,9 +22,10 @@ export default function Leaderboard() {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       setLoadingUser(true);
-      const token = typeof window !== "undefined"
-        ? localStorage.getItem("access_token")
-        : null;
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("access_token")
+          : null;
 
       if (!token) {
         console.warn("No access token found in localStorage");
@@ -96,7 +97,7 @@ export default function Leaderboard() {
 
   // Sort and find current user
   const sortedLeaderboard = [...leaderboardData].sort(
-    (a, b) => b.score - a.score
+    (a, b) => b.score - a.score,
   );
 
   const currentUser = sortedLeaderboard.find(
@@ -104,7 +105,7 @@ export default function Leaderboard() {
       entry.full_name &&
       currentUserName &&
       entry.full_name.trim().toLowerCase() ===
-        currentUserName.trim().toLowerCase()
+        currentUserName.trim().toLowerCase(),
   );
 
   const currentUserRank = currentUser
@@ -146,7 +147,8 @@ export default function Leaderboard() {
 
                 <p className="text-slate-300 text-sm mt-2 max-w-xl">
                   Every point earned reflects a real-world impact. <br />
-                  Explore the leaderboard and celebrate the heroes driving change in our rescue community.
+                  Explore the leaderboard and celebrate the heroes driving
+                  change in our rescue community.
                 </p>
 
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-5">
@@ -166,7 +168,6 @@ export default function Leaderboard() {
           </div>
         </div>
       </section>
-
 
       {/* Global error (if any) */}
       {error && (
@@ -221,8 +222,7 @@ export default function Leaderboard() {
                 <div className="flex items-center gap-3">
                   <Search className="w-5 h-5 text-blue-500" />
                   <span>
-                    Lost Pets Found:{" "}
-                    <strong>{currentUser.lost_pets}</strong>
+                    Lost Pets Found: <strong>{currentUser.lost_pets}</strong>
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -240,6 +240,11 @@ export default function Leaderboard() {
 
       {/* Leaderboard Table */}
       <section className="max-w-7xl mx-auto px-4 py-8">
+        <SectionHeading
+          eyebrow="Community rankings"
+          title="Leaderboard"
+          description="See the contributors making the biggest rescue impact."
+        />
         <div className="overflow-x-auto rounded-lg shadow bg-white">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-100">
@@ -318,7 +323,8 @@ export default function Leaderboard() {
                     colSpan={9}
                     className="px-6 py-6 text-center text-sm text-gray-500"
                   >
-                    No leaderboard data yet. Activity will show up here once users start participating.
+                    No leaderboard data yet. Activity will show up here once
+                    users start participating.
                   </td>
                 </tr>
               )}

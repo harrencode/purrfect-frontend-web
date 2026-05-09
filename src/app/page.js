@@ -12,6 +12,7 @@ import {
 import HeroSection from "./components/HeroSection";
 import Map from "./components/Map";
 import FullPageLoader from "./components/FullPageLoader";
+import SectionHeading from "./components/SectionHeading";
 import Image from "next/image";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
@@ -364,9 +365,13 @@ export default function Home() {
       {/* EVERYTHING BELOW HERE IS UNCHANGED UNTIL ALERTS SECTION*/}
 
       <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
-        <h1 className="text-slate-900 text-center text-2xl font-semibold py-5 border-b border-amber-200/60">
-          AI Recommended Pets for You
-        </h1>
+        <div className="px-6 pt-8">
+          <SectionHeading
+            eyebrow="AI matches"
+            title="AI Recommended Pets for You"
+            description="Personalized adoption suggestions based on your saved preferences."
+          />
+        </div>
 
         <div className="flex flex-wrap justify-center gap-6 p-6">
           {loadingRecs &&
@@ -486,9 +491,13 @@ export default function Home() {
         <div className="flex flex-row w-full h-[80vh]">
           {/* Map */}
           <div className="basis-1/2 p-4">
-            <h1 className="text-black text-2xl font-bold mb-4">
-              Purr-fect Stray Locator
-            </h1>
+            <SectionHeading
+              eyebrow="Live map"
+              title="Purr-fect Stray Locator"
+              description="View stray animal reports and map activity around you."
+              compact
+              className="mb-4"
+            />
             <div id="map" className="w-full h-auto rounded-lg shadow-md">
               <Map />
             </div>
@@ -497,9 +506,13 @@ export default function Home() {
           {/* Alerts – now powered by nearby rescue missions */}
 
           <div className="basis-1/2 p-4 flex flex-col">
-            <h1 className="text-black text-2xl font-bold mb-4">
-              Rescue Alerts Near You
-            </h1>
+            <SectionHeading
+              eyebrow="Nearby alerts"
+              title="Rescue Alerts Near You"
+              description="Recent rescue reports close to your location."
+              compact
+              className="mb-4"
+            />
 
             {/* only this part scrolls */}
             {/* <div className="flex-1 overflow-y-auto"> */}

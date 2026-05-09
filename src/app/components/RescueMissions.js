@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MapPin, PawPrint, X } from "lucide-react";
 import Image from "next/image";
+import SectionHeading from "./SectionHeading";
 
 export default function RescueMissions({
   missions = [],
@@ -86,9 +87,13 @@ export default function RescueMissions({
 
   return (
     <section className="w-full bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200 py-10 px-6 md:px-16">
-      <h2 className="text-2xl font-semibold text-slate-800 mb-8">
-        All Rescue Missions
-      </h2>
+      <SectionHeading
+        eyebrow="Rescue board"
+        title="All Rescue Missions"
+        description="Track active rescue reports and join missions that need help."
+        align="center"
+        compact
+      />
 
       {loading ? (
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">

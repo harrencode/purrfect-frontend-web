@@ -1,40 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { loadGoogleMaps } from "../lib/googleMaps";
 
 const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/stray-map/`;
-
-// Load Google Maps JS only once, even if called multiple times
-const loadGoogleMaps = () =>
-  new Promise((resolve, reject) => {
-    if (typeof window === "undefined") return;
-
-    // If already loaded, just resolve
-    if (window.google && window.google.maps) {
-      resolve();
-      return;
-    }
-
-    // If a script tag already exists, listen for its load
-    const existingScript = document.querySelector(
-      'script[src^="https://maps.googleapis.com/maps/api/js"]'
-    );
-    if (existingScript) {
-      existingScript.addEventListener("load", () => resolve());
-      existingScript.addEventListener("error", reject);
-      return;
-    }
-
-    // Create script once
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => resolve();
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
 
 export default function Map() {
   const mapRef = useRef(null);
@@ -47,9 +17,10 @@ export default function Map() {
   // Fetch all stray markers
   const fetchNearbyStrays = async () => {
     try {
-      const token = typeof window !== "undefined"
-        ? localStorage.getItem("access_token")
-        : null;
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("access_token")
+          : null;
 
       const res = await fetch(`${API_URL}?location_type=stray_animal`, {
         headers: {
@@ -58,11 +29,12 @@ export default function Map() {
         },
       });
 
-      if (!res.ok) throw new Error(`Failed to fetch stray data (${res.status})`);
+      if (!res.ok)
+        throw new Error(`Failed to fetch stray data (${res.status})`);
       const data = await res.json();
 
       const onlyStrays = data.filter(
-        (item) => item.location_type === "stray_animal"
+        (item) => item.location_type === "stray_animal",
       );
 
       setStrays(onlyStrays);
@@ -150,7 +122,7 @@ export default function Map() {
       });
 
       marker.addListener("click", () =>
-        infoWindow.open(mapInstance.current, marker)
+        infoWindow.open(mapInstance.current, marker),
       );
       markersRef.current.push(marker);
     });
@@ -193,7 +165,6 @@ export default function Map() {
   //   };
   // }, []);
 
-
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -201,7 +172,7 @@ export default function Map() {
 
     const setup = async (lat, lng) => {
       try {
-        await loadGoogleMaps();
+        await loadGoogleMaps(apiKey);
         if (cancelled) return;
 
         initMap(lat, lng);
@@ -218,7 +189,7 @@ export default function Map() {
     // Skip geolocation on insecure origins
     if (!window.isSecureContext || !("geolocation" in navigator)) {
       console.warn(
-        "Geolocation not available (needs HTTPS or localhost). Using default map center."
+        "Geolocation not available (needs HTTPS or localhost). Using default map center.",
       );
       setup(defaultLat, defaultLng);
     } else {
@@ -230,7 +201,7 @@ export default function Map() {
         (err) => {
           console.warn("Geolocation failed:", err?.message ?? err);
           setup(defaultLat, defaultLng);
-        }
+        },
       );
     }
 
@@ -238,7 +209,6 @@ export default function Map() {
       cancelled = true;
     };
   }, []);
-
 
   useEffect(() => {
     if (strays.length) {

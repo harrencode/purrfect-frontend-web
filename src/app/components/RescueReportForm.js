@@ -2,33 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { LocateFixed, MapIcon, X } from "lucide-react";
+import { loadGoogleMaps } from "../lib/googleMaps";
 
 const DEFAULT_CENTER = { lat: 7.8731, lng: 80.7718 };
-
-function loadGoogleMapsScript(apiKey) {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") return reject("Window is undefined");
-    if (window.google?.maps) return resolve(window.google.maps);
-
-    const existing = document.getElementById("google-maps-script");
-    if (existing) {
-      existing.addEventListener("load", () => resolve(window.google.maps));
-      existing.addEventListener("error", () =>
-        reject("Failed to load Google Maps script"),
-      );
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.id = "google-maps-script";
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => resolve(window.google.maps);
-    script.onerror = () => reject("Failed to load Google Maps script");
-    document.head.appendChild(script);
-  });
-}
 
 export default function RescueReportForm({ onClose, onSubmit }) {
   const API_BASE = process.env.NEXT_PUBLIC_API_URL;
@@ -96,7 +72,7 @@ export default function RescueReportForm({ onClose, onSubmit }) {
 
     let mounted = true;
 
-    loadGoogleMapsScript(GOOGLE_API_KEY)
+    loadGoogleMaps(GOOGLE_API_KEY)
       .then((maps) => {
         if (!mounted || !mapContainerRef.current) return;
 

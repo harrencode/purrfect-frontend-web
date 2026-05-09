@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MapPin, PawPrint, X } from "lucide-react";
 import Image from "next/image";
+import SectionHeading from "./SectionHeading";
 
 export default function RescueMissionsNearby({
   missions = [],
@@ -83,9 +84,13 @@ export default function RescueMissionsNearby({
 
   return (
     <section className="w-full bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200 py-10 px-6 md:px-16">
-      <h2 className="text-2xl font-semibold text-slate-800 mb-8">
-        Rescue Missions Near You
-      </h2>
+      <SectionHeading
+        eyebrow="Nearby rescues"
+        title="Rescue Missions Near You"
+        description="See urgent rescue reports around your current location."
+        align="center"
+        compact
+      />
 
       {loading ? (
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">

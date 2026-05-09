@@ -5,6 +5,7 @@ import {
   PawPrint,
   ArrowRight,
 } from "lucide-react";
+import SectionHeading from "../components/SectionHeading";
 
 export default function AboutUs() {
   return (
@@ -19,14 +20,12 @@ export default function AboutUs() {
         <div className="flex flex-col items-center gap-8 md:flex-row md:items-start">
           {/* Left: Text */}
           <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/60 backdrop-blur-xl border border-white/80 px-3 py-1 text-xs font-medium text-orange-700 shadow-sm">
-              <PawPrint className="h-4 w-4" />
-              <span>About Purrfect</span>
-            </div>
-
-            <h2 className="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tight">
-              A kinder platform for every rescue story.
-            </h2>
+            <SectionHeading
+              eyebrow="About Purrfect"
+              title="A kinder platform for every rescue story."
+              align="center"
+              className="mb-0 md:items-start md:text-left"
+            />
 
             <p className="text-sm md:text-base leading-relaxed text-slate-700 max-w-xl">
               Purrfect brings rescuers, volunteers, and shelters together in one
@@ -45,7 +44,6 @@ export default function AboutUs() {
               </div>
             </div>
 
-            
             {/* <div className="mt-6 flex flex-wrap items-center justify-center md:justify-start gap-3">
               <button className="inline-flex items-center gap-2 rounded-full bg-green-600 px-5 py-2.5 text-sm font-medium text-white shadow-md transition hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2">
                 <PawPrint className="h-4 w-4" />
@@ -87,13 +85,17 @@ export default function AboutUs() {
                   <span className="mt-1">
                     <Sparkles className="h-3.5 w-3.5 text-green-600" />
                   </span>
-                  <span>Reward volunteers with badges, stats, and gratitude.</span>
+                  <span>
+                    Reward volunteers with badges, stats, and gratitude.
+                  </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="mt-1">
                     <Sparkles className="h-3.5 w-3.5 text-green-600" />
                   </span>
-                  <span>Share rescue journeys that inspire others to join.</span>
+                  <span>
+                    Share rescue journeys that inspire others to join.
+                  </span>
                 </li>
               </ul>
             </div>
@@ -124,7 +126,6 @@ export default function AboutUs() {
             </p>
           </div>
 
-          
           <div className="rounded-2xl bg-white/40 backdrop-blur-2xl border border-white/70 shadow-md p-5 flex flex-col gap-3">
             <div className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-500">
               <Sparkles className="h-4 w-4 text-purple-500" />
@@ -133,9 +134,7 @@ export default function AboutUs() {
             <p className="text-sm text-slate-800">
               Purrfect turns your real rescue activity into live insights — from
               missions logged to volunteers engaged and adoptions completed.
-              
             </p>
-            
           </div>
         </div>
       </div>

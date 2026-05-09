@@ -1,9 +1,10 @@
 "use client";
+
 import React from "react";
 import Image from "next/image";
+import SectionHeading from "./SectionHeading";
 
 export default function NearbyLostPets({ pets, loading }) {
-  // Status badge color helper
   const getStatusClasses = (status) => {
     switch (status) {
       case "Lost":
@@ -21,9 +22,12 @@ export default function NearbyLostPets({ pets, loading }) {
 
   return (
     <section className="py-10 px-10 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center md:text-left">
-        🐾 Missing Paws Near You
-      </h2>
+      <SectionHeading
+        eyebrow="Nearby reports"
+        title="Missing Paws Near You"
+        description="Lost and found reports closest to your current location."
+        align="center"
+      />
 
       {loading ? (
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -64,7 +68,6 @@ export default function NearbyLostPets({ pets, loading }) {
               key={pet.reportId || i}
               className="group relative bg-white rounded-2xl border border-amber-200 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
-              {/* Pet Photo */}
               <div className="relative">
                 <Image
                   src={pet.photo || "/images/default-pet.png"}
@@ -74,7 +77,6 @@ export default function NearbyLostPets({ pets, loading }) {
                   className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
 
-                {/* Status Badge */}
                 <span
                   className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full pointer-events-none ${getStatusClasses(
                     pet.status,
@@ -84,7 +86,6 @@ export default function NearbyLostPets({ pets, loading }) {
                 </span>
               </div>
 
-              {/* Pet Details */}
               <div className="p-5">
                 <h3 className="text-lg font-bold text-gray-800 truncate">
                   {pet.pet_name || "Unnamed Pet"}
@@ -95,7 +96,7 @@ export default function NearbyLostPets({ pets, loading }) {
                 </p>
 
                 <p className="text-sm text-gray-600 mt-1">
-                  📍 {pet.location || "Unknown Location"}
+                  Location: {pet.location || "Unknown Location"}
                 </p>
 
                 {pet.description && (
@@ -104,7 +105,6 @@ export default function NearbyLostPets({ pets, loading }) {
                   </p>
                 )}
 
-                {/* Chat Button */}
                 <button
                   onClick={() => {
                     if (pet.chatId)
@@ -113,7 +113,7 @@ export default function NearbyLostPets({ pets, loading }) {
                   }}
                   className="mt-4 w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium text-sm py-2 rounded-lg shadow-sm transition"
                 >
-                  💬 Help Find
+                  Help Find
                 </button>
               </div>
             </div>

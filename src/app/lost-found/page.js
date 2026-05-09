@@ -5,12 +5,10 @@ import { LocateFixed, MapIcon, Search, UserSearch, X } from "lucide-react";
 import LostCard from "../components/LostCard";
 import NearbyLostPets from "../components/NearbyLostPets";
 import FullPageLoader from "../components/FullPageLoader";
-import {
-  GoogleMap,
-  Marker,
-  useJsApiLoader,
-  Autocomplete,
-} from "@react-google-maps/api";
+import FlashMessage from "../components/FlashMessage";
+import SectionHeading from "../components/SectionHeading";
+import { GoogleMap, Marker, Autocomplete } from "@react-google-maps/api";
+import { loadGoogleMaps } from "../lib/googleMaps";
 
 export default function LostFound() {
   const [showModal, setShowModal] = useState(false);
@@ -29,11 +27,14 @@ export default function LostFound() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [flashMessage, setFlashMessage] = useState("");
   const [nearby, setNearby] = useState([]);
   const [radius, setRadius] = useState(10);
   const [loadingNearby, setLoadingNearby] = useState(true);
   const [mapVisible, setMapVisible] = useState(false);
+  const [lostReportsRefreshKey, setLostReportsRefreshKey] = useState(0);
+  const [mapsLoaded, setMapsLoaded] = useState(false);
+  const [mapsError, setMapsError] = useState("");
 
   const [pageLoading, setPageLoading] = useState(true);
 
@@ -50,12 +51,6 @@ export default function LostFound() {
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
-
-  // Load Google Maps
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-    libraries: ["places"],
-  });
 
   // Convert coordinates to Plus Code (fallback to lat/lon)
   const getPlusCode = async (lat, lon) => {
@@ -132,6 +127,7 @@ export default function LostFound() {
       () => setError("Unable to fetch current location."),
     );
   }, []);
+  const clearFlash = useCallback(() => setFlashMessage(""), []);
 
   // Upload to S3
   const uploadToS3 = async (file) => {
@@ -160,7 +156,7 @@ export default function LostFound() {
     e.preventDefault();
     setSubmitting(true);
     setError("");
-    setSuccess("");
+    setFlashMessage("");
 
     if (!token) {
       setError("You must login first.");
@@ -185,7 +181,7 @@ export default function LostFound() {
       });
 
       if (!res.ok) throw new Error("Failed to create report");
-      setSuccess("Lost pet report submitted successfully!");
+      setFlashMessage("Lost pet report submitted successfully.");
 
       setFormData({
         pet_name: "",
@@ -201,10 +197,11 @@ export default function LostFound() {
       });
       setMapVisible(false);
 
-      setTimeout(() => setShowModal(false), 1200);
+      setShowModal(false);
 
       // Refresh nearby list after submitting a report
-      fetchNearby();
+      await fetchNearby();
+      setLostReportsRefreshKey((key) => key + 1);
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -266,9 +263,31 @@ export default function LostFound() {
     };
   }, [fetchNearby]);
 
+  useEffect(() => {
+    if (!showModal || mapsLoaded) return;
+
+    let mounted = true;
+
+    loadGoogleMaps(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)
+      .then(() => {
+        if (!mounted) return;
+        setMapsLoaded(true);
+        setMapsError("");
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        setMapsError(err.message);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [mapsLoaded, showModal]);
+
   return (
     <div className="relative">
       {pageLoading && <FullPageLoader />}
+      <FlashMessage message={flashMessage} onDismiss={clearFlash} />
 
       {/* Hero Section*/}
       <section className="relative w-full min-h-[400px] overflow-hidden flex items-center">
@@ -331,10 +350,13 @@ export default function LostFound() {
 
       {/* All Lost Pets */}
       <section className="py-8 m-auto px-10 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          🐾 All Missing Pets
-        </h2>
-        <LostCard showStatusBadge={true} />
+        <SectionHeading
+          eyebrow="Lost and found"
+          title="All Missing Pets"
+          description="Review every active missing pet report in the community."
+          align="center"
+        />
+        <LostCard showStatusBadge={true} refreshKey={lostReportsRefreshKey} />
       </section>
 
       {/* Report Lost Pet Modal */}
@@ -421,7 +443,7 @@ export default function LostFound() {
                 />
                  */}
 
-                {isLoaded && mapVisible && (
+                {mapsLoaded && mapVisible && (
                   <div className="h-64 w-full overflow-hidden rounded-xl border border-slate-200">
                     <GoogleMap
                       center={mapCenter}
@@ -441,7 +463,7 @@ export default function LostFound() {
                   </div>
                 )}
 
-                {isLoaded ? (
+                {mapsLoaded ? (
                   <Autocomplete
                     onLoad={(ac) => (autocompleteRef.current = ac)}
                     onPlaceChanged={handlePlaceChanged}
@@ -457,11 +479,20 @@ export default function LostFound() {
                 ) : (
                   <input
                     type="text"
-                    placeholder="Loading Google..."
+                    placeholder={
+                      mapsError
+                        ? "Google Maps unavailable"
+                        : "Loading Google..."
+                    }
                     value={formData.location}
                     onChange={handleLocationChange}
                     className="mt-3 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none"
                   />
+                )}
+                {mapsError && (
+                  <p className="mt-2 text-sm font-medium text-red-600">
+                    {mapsError}
+                  </p>
                 )}
                 <div className="mb-3 mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <button
@@ -507,12 +538,6 @@ export default function LostFound() {
                   {error}
                 </p>
               )}
-              {success && (
-                <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-                  {success}
-                </p>
-              )}
-
               <div className="sticky bottom-0 -mx-6 border-t border-slate-100 bg-white px-6 pt-4">
                 <button
                   type="submit"

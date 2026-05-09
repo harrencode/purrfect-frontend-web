@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { PawPrint, SlidersHorizontal, Upload, X } from "lucide-react";
 import FullPageLoader from "../components/FullPageLoader";
+import FlashMessage from "../components/FlashMessage";
+import SectionHeading from "../components/SectionHeading";
 import Image from "next/image";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
@@ -14,6 +16,7 @@ export default function Adopts() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [loadingRecs, setLoadingRecs] = useState(false);
   const [myAdoptionReqs, setMyAdoptionReqs] = useState([]);
+  const [flashMessage, setFlashMessage] = useState("");
 
   const [pageLoading, setPageLoading] = useState(true);
 
@@ -167,6 +170,7 @@ export default function Adopts() {
     const { name, value } = e.target;
     setPreferences((prev) => ({ ...prev, [name]: value }));
   };
+  const clearFlash = useCallback(() => setFlashMessage(""), []);
 
   // UPDATED to refresh AI recommendations after saving
   const handlePrefSubmit = async (e) => {
@@ -182,8 +186,8 @@ export default function Adopts() {
       });
       if (!res.ok) throw new Error("Failed to update preferences");
 
-      alert("Preferences updated successfully!");
       setUserPrefs(false);
+      setFlashMessage("Preferences updated successfully.");
 
       //  Clear and reload recommended pets
       setRecommendedPets([]);
@@ -242,7 +246,10 @@ export default function Adopts() {
       }
 
       await fetchAdoptionReqs();
+      await fetchMyAdoptionReqs();
+      await fetchRecommendedPets();
       setShowModal(false);
+      setFlashMessage("Adoption listing saved successfully.");
       setFormData({
         description: "",
         pet: {
@@ -317,6 +324,7 @@ export default function Adopts() {
   return (
     <div className="relative">
       {pageLoading && <FullPageLoader />}
+      <FlashMessage message={flashMessage} onDismiss={clearFlash} />
       {/* Hero Section */}
       <section className="relative w-full min-h-[400px] overflow-hidden flex items-center">
         {/* Background */}
@@ -379,9 +387,14 @@ export default function Adopts() {
       {/* Recommended Pets */}
       {/* Shared Card Component Rendering */}
       <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
-        <h1 className="text-slate-900 text-center text-2xl font-semibold py-5 border-b border-amber-200/60">
-          AI Recommended Pets for You
-        </h1>
+        <div className="px-6 pt-8">
+          <SectionHeading
+            eyebrow="AI matches"
+            title="AI Recommended Pets for You"
+            description="Recommendations tuned to your adoption preferences."
+            align="center"
+          />
+        </div>
         <div className="flex flex-wrap justify-center gap-6 p-6">
           {loadingRecs &&
             Array.from({ length: 4 }).map((_, index) => (
@@ -511,9 +524,14 @@ export default function Adopts() {
 
       {/* My Adoption Requests */}
       <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
-        <h1 className="text-slate-900 text-center text-2xl font-semibold py-5 border-b border-amber-200/60">
-          My Adoption Requests
-        </h1>
+        <div className="px-6 pt-8">
+          <SectionHeading
+            eyebrow="Your listings"
+            title="My Adoption Requests"
+            description="Manage pets you have listed or adoption conversations you started."
+            align="center"
+          />
+        </div>
         <div className="flex flex-wrap justify-center gap-6 p-6">
           {myAdoptionReqs.length === 0 ? (
             <div className="w-full max-w-2xl rounded-2xl border border-amber-200 bg-white/80 p-6 text-center shadow-sm">
@@ -622,9 +640,14 @@ export default function Adopts() {
 
       {/* Meet Your Purr-fect Match */}
       <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
-        <h1 className="text-slate-900 text-center text-2xl font-semibold py-5 border-b border-amber-200/60">
-          Meet your Purr-fect Match
-        </h1>
+        <div className="px-6 pt-8">
+          <SectionHeading
+            eyebrow="Adoption catalog"
+            title="Meet your Purr-fect Match"
+            description="Browse active pet listings from the community."
+            align="center"
+          />
+        </div>
         <div className="flex flex-wrap justify-center gap-6 p-6">
           {adoptionReqs.length === 0 && (
             <div className="w-full max-w-2xl rounded-2xl border border-amber-200 bg-white/80 p-6 text-center shadow-sm">

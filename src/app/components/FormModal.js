@@ -2,8 +2,9 @@
 
 import { useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
+import { Autocomplete } from "@react-google-maps/api";
 import { LocateFixed, MapPin, Navigation, Save, X } from "lucide-react";
+import { loadGoogleMaps } from "../lib/googleMaps";
 
 const MapPicker = dynamic(() => import("./MapPicker"), { ssr: false });
 const GOOGLE_LIBRARIES = ["places"];
@@ -14,7 +15,7 @@ const typeLabels = {
   VetCenter: "Vet Center",
 };
 
-export default function FormModal({ type, onClose }) {
+export default function FormModal({ type, onClose, onSaved }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -26,16 +27,25 @@ export default function FormModal({ type, onClose }) {
   const [showMap, setShowMap] = useState(false);
   const [addressError, setAddressError] = useState("");
   const [mapCenter, setMapCenter] = useState(null);
+  const [mapsLoaded, setMapsLoaded] = useState(false);
+  const [mapsError, setMapsError] = useState("");
 
   const autocompleteRef = useRef(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: GOOGLE_API_KEY,
-    libraries: GOOGLE_LIBRARIES,
-  });
+  const handleLoadMaps = async () => {
+    if (mapsLoaded || mapsError) return;
+
+    try {
+      await loadGoogleMaps(GOOGLE_API_KEY, GOOGLE_LIBRARIES);
+      setMapsLoaded(true);
+      setMapsError("");
+    } catch (err) {
+      setMapsError(err.message);
+    }
+  };
 
   const typeMap = {
     StrayAnimal: "stray_animal",
@@ -150,8 +160,8 @@ export default function FormModal({ type, onClose }) {
       return;
     }
 
-    alert("Data saved successfully!");
     onClose();
+    onSaved?.(`${typeLabels[type] || "Data"} saved successfully.`);
   };
 
   const coordsSet = !!(formData.latitude && formData.longitude);
@@ -212,7 +222,7 @@ export default function FormModal({ type, onClose }) {
               <MapPin size={16} /> Location
             </label>
 
-            {isLoaded ? (
+            {mapsLoaded ? (
               <Autocomplete
                 onLoad={(ac) => (autocompleteRef.current = ac)}
                 onPlaceChanged={handlePlaceChanged}
@@ -229,15 +239,23 @@ export default function FormModal({ type, onClose }) {
               <input
                 name="address"
                 value={formData.address}
-                onChange={handleChange}
+                onFocus={handleLoadMaps}
+                onChange={(e) => {
+                  handleLoadMaps();
+                  handleChange(e);
+                }}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none placeholder:text-slate-400"
-                placeholder="Loading Google..."
+                placeholder={
+                  mapsError
+                    ? "Google Maps unavailable"
+                    : "Search and pick a place"
+                }
               />
             )}
 
-            {addressError && (
+            {(addressError || mapsError) && (
               <p className="mt-2 text-sm font-medium text-red-600">
-                {addressError}
+                {addressError || mapsError}
               </p>
             )}
 

@@ -1,21 +1,31 @@
-'use client'
+"use client";
 
-import { ShoppingCart, Store, History } from "lucide-react"
-import ItemCard from "../components/ItemCard"
-import { CartProvider } from "../components/CartContext"
-import CartModal from "../components/CartModal"
-import OrderHistoryModal from "../components/OrderHistoryModal"
-import { useState } from "react"
-import FullPageLoader from "../components/FullPageLoader" 
+import { ShoppingCart, Store, History } from "lucide-react";
+import ItemCard from "../components/ItemCard";
+import { CartProvider } from "../components/CartContext";
+import CartModal from "../components/CartModal";
+import OrderHistoryModal from "../components/OrderHistoryModal";
+import { useCallback, useState } from "react";
+import FullPageLoader from "../components/FullPageLoader";
+import FlashMessage from "../components/FlashMessage";
 
 export default function Shop() {
-  const [showCart, setShowCart] = useState(false)
-  const [showOrders, setShowOrders] = useState(false)
-  const [pageLoading, setPageLoading] = useState(true)
+  const [showCart, setShowCart] = useState(false);
+  const [showOrders, setShowOrders] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [flashMessage, setFlashMessage] = useState("");
+  const [productsRefreshKey, setProductsRefreshKey] = useState(0);
+
+  const clearFlash = useCallback(() => setFlashMessage(""), []);
+  const handleInitialProductsLoad = useCallback(() => {
+    setPageLoading(false);
+  }, []);
+
   return (
     <CartProvider>
       <div className="min-h-screen relative">
         {pageLoading && <FullPageLoader />}
+        <FlashMessage message={flashMessage} onDismiss={clearFlash} />
 
         {/* Hero Section */}
         <section className="relative w-full min-h-[420px] overflow-hidden flex items-center">
@@ -77,17 +87,32 @@ export default function Shop() {
           </div>
         </section>
 
-
         {/* Modals */}
-        {showCart && <CartModal onClose={() => setShowCart(false)} />}
-        {showOrders && <OrderHistoryModal onClose={() => setShowOrders(false)} />}
+        {showCart && (
+          <CartModal
+            onClose={() => setShowCart(false)}
+            onCheckoutComplete={() => {
+              setShowCart(false);
+              setProductsRefreshKey((key) => key + 1);
+              setFlashMessage("Order saved successfully.");
+            }}
+          />
+        )}
+        {showOrders && (
+          <OrderHistoryModal onClose={() => setShowOrders(false)} />
+        )}
 
         {/* Product Grid */}
         <section className="m-auto px-10 py-12 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
-          <ItemCard onInitialLoadComplete={() => setPageLoading(false)} />
+          <ItemCard
+            onInitialLoadComplete={handleInitialProductsLoad}
+            refreshKey={productsRefreshKey}
+            onAddedToCart={(productName) =>
+              setFlashMessage(`${productName} added to cart.`)
+            }
+          />
         </section>
-
       </div>
     </CartProvider>
-  )
+  );
 }

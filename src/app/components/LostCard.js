@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function LostCard() {
+export default function LostCard({ refreshKey = 0 }) {
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,7 +39,7 @@ export default function LostCard() {
     };
 
     fetchPets();
-  }, [API_URL]);
+  }, [API_URL, refreshKey]);
 
   if (loading)
     return (

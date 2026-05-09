@@ -10,8 +10,9 @@ import {
   Lock,
 } from "lucide-react";
 import Image from "next/image";
+import SectionHeading from "../components/SectionHeading";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL; 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const PROFILE_UPLOAD_URL =
   process.env.NEXT_PUBLIC_PROFILE_UPLOAD_URL ||
   `${API_BASE_URL}/users/upload-s3?folder=profiles`;
@@ -39,7 +40,7 @@ export default function ProfilePage() {
   const [profileImageError, setProfileImageError] = useState(false);
   const photoInputRef = useRef(null);
 
-  // Preferences form state 
+  // Preferences form state
   const [preferences, setPreferences] = useState({
     preferred_species: "any",
     preferred_size: "any",
@@ -53,7 +54,9 @@ export default function ProfilePage() {
   const getAuthHeaders = (includeJson = true) => {
     const token = localStorage.getItem("access_token");
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    return includeJson ? { ...headers, "Content-Type": "application/json" } : headers;
+    return includeJson
+      ? { ...headers, "Content-Type": "application/json" }
+      : headers;
   };
 
   // Load current user on mount
@@ -115,10 +118,8 @@ export default function ProfilePage() {
       preferred_size: preferences.preferred_size || null,
       temperament: preferences.temperament || null,
       activity_level: preferences.activity_level || null,
-      min_age:
-        preferences.min_age === "" ? null : Number(preferences.min_age),
-      max_age:
-        preferences.max_age === "" ? null : Number(preferences.max_age),
+      min_age: preferences.min_age === "" ? null : Number(preferences.min_age),
+      max_age: preferences.max_age === "" ? null : Number(preferences.max_age),
     };
 
     try {
@@ -283,18 +284,16 @@ export default function ProfilePage() {
       <div className="relative mx-auto flex max-w-5xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-start gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/70 backdrop-blur-md shadow-md">
               <UserIcon className="h-5 w-5 text-slate-800" />
             </div>
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">
-                Your Profile
-              </p>
-              <h1 className="text-xl md:text-2xl font-semibold text-slate-900">
-                Account & Preferences
-              </h1>
-            </div>
+            <SectionHeading
+              eyebrow="Your profile"
+              title="Account & Preferences"
+              description="Manage your identity, adoption preferences, and account security."
+              className="mb-0"
+            />
           </div>
         </div>
 
@@ -355,7 +354,9 @@ export default function ProfilePage() {
                         {photoUploading && (
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
                         )}
-                        <span>{photoUploading ? "Uploading..." : "Change photo"}</span>
+                        <span>
+                          {photoUploading ? "Uploading..." : "Change photo"}
+                        </span>
                       </button>
                     </div>
                     {(photoSuccess || photoError) && (
@@ -405,7 +406,10 @@ export default function ProfilePage() {
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs md:text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
                     value={preferences.preferred_species}
                     onChange={(e) =>
-                      handlePreferenceChange("preferred_species", e.target.value)
+                      handlePreferenceChange(
+                        "preferred_species",
+                        e.target.value,
+                      )
                     }
                   >
                     <option value="any">Any</option>
@@ -508,9 +512,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {prefError && (
-                <p className="text-xs text-red-500">{prefError}</p>
-              )}
+              {prefError && <p className="text-xs text-red-500">{prefError}</p>}
               {prefSuccess && (
                 <p className="text-xs text-green-600">{prefSuccess}</p>
               )}
@@ -559,7 +561,7 @@ export default function ProfilePage() {
                     onChange={(e) =>
                       handlePasswordInputChange(
                         "current_password",
-                        e.target.value
+                        e.target.value,
                       )
                     }
                   />
@@ -590,7 +592,7 @@ export default function ProfilePage() {
                     onChange={(e) =>
                       handlePasswordInputChange(
                         "new_password_confirm",
-                        e.target.value
+                        e.target.value,
                       )
                     }
                   />

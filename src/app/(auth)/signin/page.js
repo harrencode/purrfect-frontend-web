@@ -1,7 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Lock, Mail, MapPin, ShieldCheck } from "lucide-react";
 import { saveAuthSession } from "../../lib/authSession";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
@@ -12,7 +14,6 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Hide Navbar/Footer on Sign-in page
   useEffect(() => {
     const nav = document.querySelector("nav");
     const footer = document.querySelector("footer");
@@ -24,10 +25,15 @@ export default function SignIn() {
     };
   }, []);
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const validateForm = () => {
+    if (!form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      setError("Please enter a valid email address.");
+      return false;
+    }
     if (form.password.length < 6) {
       setError("Password must be at least 6 characters long.");
       return false;
@@ -39,15 +45,17 @@ export default function SignIn() {
     e.preventDefault();
     setError("");
     if (!validateForm()) return;
-    setLoading(true);
 
+    setLoading(true);
     try {
       let latitude = null;
       let longitude = null;
 
       try {
         const position = await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            timeout: 5000,
+          });
         });
         latitude = position.coords.latitude;
         longitude = position.coords.longitude;
@@ -67,12 +75,15 @@ export default function SignIn() {
           longitude: longitude ?? "",
         }),
       });
+      const data = await response.json().catch(() => ({}));
 
-      const data = await response.json();
-      // Redirect if email not verified
-      if (response.status === 403 && data?.detail?.code === "EMAIL_NOT_VERIFIED") {
-        router.replace(`/verify-account?email=${encodeURIComponent(data.detail.email || form.email)}`);
-
+      if (
+        response.status === 403 &&
+        data?.detail?.code === "EMAIL_NOT_VERIFIED"
+      ) {
+        router.replace(
+          `/verify-account?email=${encodeURIComponent(data.detail.email || form.email)}`,
+        );
         return;
       }
 
@@ -82,122 +93,134 @@ export default function SignIn() {
             ? data.detail
             : data?.detail?.code === "ACCOUNT_INACTIVE"
               ? "Account is inactive."
-              : data?.detail?.code === "EMAIL_NOT_VERIFIED"
-                ? "Email not verified."
-                : "Login failed";
-
+              : "Login failed. Please check your email and password.";
         throw new Error(msg);
       }
 
-
-      if (data?.access_token) {
-        saveAuthSession(
-          data.access_token,
-          data.expires_in,
-          data.refresh_token,
-          data.refresh_expires_in,
-        );
-        router.push("/");
-      } else {
-        throw new Error("Login failed — token missing");
+      if (!data?.access_token) {
+        throw new Error("Login failed because the token was missing.");
       }
-    } catch (err) {
-      console.error(err);
-      setError(
-        err.message.includes("denied")
-          ? "Please allow location access to see nearby rescue/lost-pet alerts."
-          : err.message
+
+      saveAuthSession(
+        data.access_token,
+        data.expires_in,
+        data.refresh_token,
+        data.refresh_expires_in,
       );
+      router.push("/");
+    } catch (err) {
+      setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
   };
 
+  const inputClass =
+    "w-full rounded-[8px] border border-slate-200 bg-white py-3 pl-11 pr-3 text-sm text-slate-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10";
 
   return (
-    <div
-      className="h-screen w-full flex items-center justify-center bg-cover bg-center relative"
+    <main
+      className="min-h-screen bg-cover bg-center px-4 py-6 text-slate-950"
       style={{ backgroundImage: "url('/images/hero-image.png')" }}
     >
-      <div className="absolute inset-0 bg-white/40 backdrop-blur-sm"></div>
-
-      <div className="relative z-10 w-full max-w-md bg-white/60 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl p-8 mx-4">
-        <div className="text-center mb-6">
+      <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px]" />
+      <section className="relative z-10 mx-auto grid min-h-[calc(100vh-3rem)] w-full max-w-5xl items-center gap-8 lg:grid-cols-[1fr_0.9fr]">
+        <aside className="hidden lg:block">
           <Image
             alt="Purr-Fect"
             src="/images/Purr-Fect.png"
-            width={160}
-            height={48}
-            className="mx-auto h-12 mb-2 drop-shadow-md"
+            width={190}
+            height={56}
+            className="mb-8 h-14 w-auto"
           />
-          <h2 className="text-3xl font-extrabold text-teal-700">Welcome Back!</h2>
-          <p className="text-gray-700 mt-1 text-sm md:text-base">
-            Sign in to{" "}
-            <span className="font-semibold text-pink-500">Purr-Fect</span> and
-            reunite with your furry friends 🐾
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            required
-            value={form.email}
-            onChange={handleChange}
-            className={`w-full rounded-xl border ${
-              error.includes("email")
-                ? "border-red-400 focus:ring-red-400"
-                : "border-gray-300 focus:ring-teal-400"
-            } focus:ring-2 px-4 py-2 text-gray-800 bg-white/70 placeholder-gray-500`}
-          />
-
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            required
-            value={form.password}
-            onChange={handleChange}
-            className={`w-full rounded-xl border ${
-              error.includes("Password")
-                ? "border-red-400 focus:ring-red-400"
-                : "border-gray-300 focus:ring-pink-400"
-            } focus:ring-2 px-4 py-2 text-gray-800 bg-white/70 placeholder-gray-500`}
-          />
-
-          {error && (
-            <p className="text-red-600 text-center font-medium text-sm">
-              {error}
+          <div className="max-w-md">
+            <p className="mb-3 inline-flex items-center gap-2 rounded-[8px] bg-white/80 px-3 py-2 text-sm font-semibold text-teal-700 shadow-sm">
+              <MapPin size={16} />
+              Nearby rescue alerts
             </p>
-          )}
+            <h1 className="text-4xl font-bold leading-tight text-slate-700">
+              Welcome back to your pet rescue dashboard
+            </h1>
+            <p className="mt-4 text-base font-medium leading-7 text-slate-600">
+              Sign in to manage adoptions, track reports, and stay close to
+              updates in your area.
+            </p>
+          </div>
+        </aside>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-2 bg-gradient-to-r from-teal-400 to-pink-400 hover:from-teal-300 hover:to-pink-300 text-white py-2.5 rounded-xl font-semibold shadow-md transition-all duration-300"
-          >
-            {loading ? "Signing In..." : "Sign In"}
-          </button>
-        </form>
+        <div className="mx-auto w-full max-w-md rounded-[8px] border border-white/70 bg-white/90 p-6 shadow-2xl shadow-slate-900/20 md:p-8">
+          <div className="mb-6 flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-950">Sign in</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                New here?{" "}
+                <a className="font-semibold text-teal-700" href="/signup">
+                  Create an account
+                </a>
+              </p>
+            </div>
+            <div className="rounded-[8px] bg-pink-50 p-3 text-pink-600">
+              <ShieldCheck size={22} />
+            </div>
+          </div>
 
-        <p className="mt-6 text-center text-gray-700 text-sm">
-          Don’t have an account?{" "}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <label className="relative block">
+              <Mail
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={18}
+              />
+              <input
+                className={inputClass}
+                name="email"
+                onChange={handleChange}
+                placeholder="Email address"
+                required
+                type="email"
+                value={form.email}
+              />
+            </label>
+
+            <label className="relative block">
+              <Lock
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={18}
+              />
+              <input
+                className={inputClass}
+                name="password"
+                onChange={handleChange}
+                placeholder="Password"
+                required
+                type="password"
+                value={form.password}
+              />
+            </label>
+
+            {error && (
+              <div className="rounded-[8px] border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+                {error}
+              </div>
+            )}
+
+            <button
+              className="flex w-full items-center justify-center gap-2 rounded-[8px] bg-slate-950 px-4 py-3 text-sm font-bold text-white transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={loading}
+              type="submit"
+            >
+              {loading ? "Signing in..." : "Sign in"}
+              <ArrowRight size={17} />
+            </button>
+          </form>
+
           <a
-            href="/signup"
-            className="text-teal-600 hover:text-pink-500 font-semibold transition"
+            className="mt-4 block text-center text-sm font-semibold text-slate-500 hover:text-slate-900"
+            href="#"
           >
-            Sign Up
-          </a>
-        </p>
-
-        <p className="mt-2 text-center text-sm text-gray-500">
-          <a href="#" className="hover:underline">
             Forgot your password?
           </a>
-        </p>
-      </div>
-    </div>
+        </div>
+      </section>
+    </main>
   );
 }

@@ -1,7 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Camera, ChevronRight, PawPrint, ShieldCheck } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 const DEFAULT_AVATAR = "/images/default-avatar.png";
@@ -9,7 +11,6 @@ const DEFAULT_AVATAR = "/images/default-avatar.png";
 export default function Signup() {
   const router = useRouter();
 
-  // Hide Navbar/Footer for this page only
   useEffect(() => {
     const nav = document.querySelector("nav");
     const footer = document.querySelector("footer");
@@ -34,21 +35,20 @@ export default function Signup() {
     min_age: "",
     max_age: "",
   });
-
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [preview, setPreview] = useState(DEFAULT_AVATAR);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setProfilePhoto(file);
-      setPreview(URL.createObjectURL(file));
-    }
+    if (!file) return;
+    setProfilePhoto(file);
+    setPreview(URL.createObjectURL(file));
   };
 
   const validateForm = () => {
@@ -71,7 +71,7 @@ export default function Signup() {
     if (
       form.min_age &&
       form.max_age &&
-      parseInt(form.min_age) > parseInt(form.max_age)
+      Number(form.min_age) > Number(form.max_age)
     ) {
       setError("Min age cannot be greater than max age.");
       return false;
@@ -87,227 +87,253 @@ export default function Signup() {
 
     setLoading(true);
     try {
-      const data = new FormData();
+      const payload = new FormData();
       Object.entries(form).forEach(([key, value]) => {
-        if (value !== "") data.append(key, value);
+        if (key !== "confirmPassword" && value !== "") {
+          payload.append(key, value);
+        }
       });
-      if (profilePhoto) data.append("profile_photo", profilePhoto);
+      if (profilePhoto) payload.append("profile_photo", profilePhoto);
 
       const response = await fetch(`${API_BASE}/auth/`, {
         method: "POST",
-        body: data,
+        body: payload,
       });
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail || "Signup failed");
+        throw new Error(
+          typeof data?.detail === "string" ? data.detail : "Signup failed",
+        );
       }
 
-      router.push("/signin");
+      const params = new URLSearchParams({ email: form.email });
+      if (data?.requires_admin_code && data?.admin_email) {
+        params.set("adminEmail", data.admin_email);
+      }
+      router.push(`/verify-account?${params.toString()}`);
     } catch (err) {
-      console.error(err);
-      setError(err.message);
+      setError(err.message || "Signup failed");
     } finally {
       setLoading(false);
     }
   };
 
+  const inputClass =
+    "w-full rounded-[8px] border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10";
+  const selectClass =
+    "w-full rounded-[8px] border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10";
+
   return (
-    <div
-      className="h-screen w-full flex items-center justify-center bg-cover bg-center relative overflow-hidden"
+    <main
+      className="min-h-screen bg-cover bg-center px-4 py-6 text-slate-950"
       style={{ backgroundImage: "url('/images/hero-image.png')" }}
     >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-white/40 backdrop-blur-sm"></div>
-
-      {/* Glass Card */}
-      <div className="relative z-10 w-full max-w-4xl bg-white/60 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl p-6 md:p-8 overflow-y-auto max-h-[90vh]">
-        {/* Header */}
-        <div className="text-center mb-4">
+      <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px]" />
+      <section className="relative z-10 mx-auto grid min-h-[calc(100vh-3rem)] w-full max-w-6xl items-center gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <aside className="hidden lg:block">
           <Image
             alt="Purr-Fect"
             src="/images/Purr-Fect.png"
-            width={160}
-            height={48}
-            className="mx-auto h-12 mb-2 drop-shadow-md"
+            width={190}
+            height={56}
+            className="mb-8 h-14 w-auto"
           />
-          <h2 className="text-3xl font-extrabold text-teal-700">
-            Create Your Account
-          </h2>
-          <p className="text-gray-700 mt-1 text-sm md:text-base">
-            Join <span className="font-semibold text-pink-500">Purr-Fect</span>{" "}
-            and help pets find loving homes 🐾
-          </p>
+          <div className="max-w-md">
+            <p className="mb-3 inline-flex items-center gap-2 rounded-[8px] bg-white/80 px-3 py-2 text-sm font-semibold text-teal-700 shadow-sm">
+              <PawPrint size={16} />
+              Adoption-ready preferences
+            </p>
+            <h1 className="text-4xl font-bold leading-tight text-slate-700">
+              Create a profile that helps match you with the right pet.
+            </h1>
+            <p className="mt-4 text-base font-medium leading-7 text-slate-600">
+              Add your basics, choose your adoption preferences, and verify your
+              account before signing in.
+            </p>
+          </div>
+        </aside>
+
+        <div className="mx-auto w-full max-w-2xl rounded-[8px] border border-white/70 bg-white/90 p-5 shadow-2xl shadow-slate-900/20 md:p-7">
+          <div className="mb-5 flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-950">
+                Create account
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Already registered?{" "}
+                <a className="font-semibold text-teal-700" href="/signin">
+                  Sign in
+                </a>
+              </p>
+            </div>
+            <div className="rounded-[8px] bg-teal-50 p-3 text-teal-700">
+              <ShieldCheck size={22} />
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-2">
+              <input
+                className={inputClass}
+                name="first_name"
+                onChange={handleChange}
+                placeholder="First name"
+                required
+                type="text"
+                value={form.first_name}
+              />
+              <input
+                className={inputClass}
+                name="last_name"
+                onChange={handleChange}
+                placeholder="Last name"
+                required
+                type="text"
+                value={form.last_name}
+              />
+            </div>
+
+            <input
+              className={inputClass}
+              name="email"
+              onChange={handleChange}
+              placeholder="Email address"
+              required
+              type="email"
+              value={form.email}
+            />
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <input
+                className={inputClass}
+                name="password"
+                onChange={handleChange}
+                placeholder="Password"
+                required
+                type="password"
+                value={form.password}
+              />
+              <input
+                className={inputClass}
+                name="confirmPassword"
+                onChange={handleChange}
+                placeholder="Confirm password"
+                required
+                type="password"
+                value={form.confirmPassword}
+              />
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-4">
+              <select
+                className={selectClass}
+                name="preferred_species"
+                onChange={handleChange}
+                value={form.preferred_species}
+              >
+                <option value="any">Any species</option>
+                <option value="dog">Dog</option>
+                <option value="cat">Cat</option>
+              </select>
+              <select
+                className={selectClass}
+                name="preferred_size"
+                onChange={handleChange}
+                value={form.preferred_size}
+              >
+                <option value="any">Any size</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+              <select
+                className={selectClass}
+                name="temperament"
+                onChange={handleChange}
+                value={form.temperament}
+              >
+                <option value="any">Any temperament</option>
+                <option value="calm">Calm</option>
+                <option value="playful">Playful</option>
+                <option value="friendly">Friendly</option>
+                <option value="energetic">Energetic</option>
+                <option value="gentle">Gentle</option>
+              </select>
+              <select
+                className={selectClass}
+                name="activity_level"
+                onChange={handleChange}
+                value={form.activity_level}
+              >
+                <option value="any">Any activity</option>
+                <option value="low">Low</option>
+                <option value="moderate">Moderate</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <input
+                className={inputClass}
+                name="min_age"
+                onChange={handleChange}
+                placeholder="Minimum age"
+                type="number"
+                value={form.min_age}
+              />
+              <input
+                className={inputClass}
+                name="max_age"
+                onChange={handleChange}
+                placeholder="Maximum age"
+                type="number"
+                value={form.max_age}
+              />
+            </div>
+
+            <label className="flex cursor-pointer items-center gap-4 rounded-[8px] border border-dashed border-slate-300 bg-slate-50 p-3">
+              <Image
+                alt="Profile preview"
+                src={preview}
+                width={56}
+                height={56}
+                className="h-14 w-14 rounded-full object-cover"
+              />
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                  <Camera size={16} />
+                  Profile photo
+                </span>
+                <span className="truncate text-xs text-slate-500">
+                  {profilePhoto?.name || "Choose an optional image"}
+                </span>
+              </span>
+              <input
+                accept="image/*"
+                className="sr-only"
+                onChange={handlePhotoChange}
+                type="file"
+              />
+            </label>
+
+            {error && (
+              <div className="rounded-[8px] border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+                {error}
+              </div>
+            )}
+
+            <button
+              className="flex w-full items-center justify-center gap-2 rounded-[8px] bg-slate-950 px-4 py-3 text-sm font-bold text-white transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={loading}
+              type="submit"
+            >
+              {loading ? "Creating account..." : "Continue to verification"}
+              <ChevronRight size={17} />
+            </button>
+          </form>
         </div>
-
-        {/* Signup Form */}
-        <form onSubmit={handleSubmit} className="space-y-3">
-          {/* Name & Email */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input
-              type="text"
-              name="first_name"
-              placeholder="First Name"
-              required
-              value={form.first_name}
-              onChange={handleChange}
-              className="rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-400 px-3 py-2 text-gray-800 bg-white/70 placeholder-gray-500"
-            />
-            <input
-              type="text"
-              name="last_name"
-              placeholder="Last Name"
-              required
-              value={form.last_name}
-              onChange={handleChange}
-              className="rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-400 px-3 py-2 text-gray-800 bg-white/70 placeholder-gray-500"
-            />
-          </div>
-
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            required
-            value={form.email}
-            onChange={handleChange}
-            className="w-full rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-400 px-3 py-2 text-gray-800 bg-white/70 placeholder-gray-500"
-          />
-
-          {/* Password */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input
-              type="password"
-              name="password"
-              placeholder="Password (min 6 chars)"
-              required
-              value={form.password}
-              onChange={handleChange}
-              className="rounded-xl border border-gray-300 focus:ring-2 focus:ring-pink-400 px-3 py-2 text-gray-800 bg-white/70 placeholder-gray-500"
-            />
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              required
-              value={form.confirmPassword}
-              onChange={handleChange}
-              className="rounded-xl border border-gray-300 focus:ring-2 focus:ring-pink-400 px-3 py-2 text-gray-800 bg-white/70 placeholder-gray-500"
-            />
-          </div>
-
-          {/* Preferences */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <select
-              name="preferred_species"
-              value={form.preferred_species}
-              onChange={handleChange}
-              className="rounded-xl border border-gray-300 focus:ring-2 focus:ring-pink-400 px-3 py-2 text-gray-800 bg-white/70"
-            >
-              <option value="any">Any Species</option>
-              <option value="dog">Dog</option>
-              <option value="cat">Cat</option>
-            </select>
-
-            <select
-              name="preferred_size"
-              value={form.preferred_size}
-              onChange={handleChange}
-              className="rounded-xl border border-gray-300 focus:ring-2 focus:ring-pink-400 px-3 py-2 text-gray-800 bg-white/70"
-            >
-              <option value="any">Any Size</option>
-              <option value="small">Small</option>
-              <option value="medium">Medium</option>
-              <option value="large">Large</option>
-            </select>
-
-            <select
-              name="temperament"
-              value={form.temperament}
-              onChange={handleChange}
-              className="rounded-xl border border-gray-300 focus:ring-2 focus:ring-amber-400 px-3 py-2 text-gray-800 bg-white/70"
-            >
-              <option value="any">Any Temperament</option>
-              <option value="calm">Calm</option>
-              <option value="playful">Playful</option>
-              <option value="friendly">Friendly</option>
-              <option value="energetic">Energetic</option>
-              <option value="gentle">Gentle</option>
-            </select>
-
-            <select
-              name="activity_level"
-              value={form.activity_level}
-              onChange={handleChange}
-              className="rounded-xl border border-gray-300 focus:ring-2 focus:ring-amber-400 px-3 py-2 text-gray-800 bg-white/70"
-            >
-              <option value="any">Any Activity</option>
-              <option value="low">Low</option>
-              <option value="moderate">Moderate</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-
-          {/* Age */}
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              type="number"
-              name="min_age"
-              placeholder="Min Age"
-              value={form.min_age}
-              onChange={handleChange}
-              className="rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-400 px-3 py-2 text-gray-800 bg-white/70"
-            />
-            <input
-              type="number"
-              name="max_age"
-              placeholder="Max Age"
-              value={form.max_age}
-              onChange={handleChange}
-              className="rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-400 px-3 py-2 text-gray-800 bg-white/70"
-            />
-          </div>
-
-          {/* Profile Photo */}
-          <div className="mt-2 flex items-center gap-4">
-            <Image
-              src={preview}
-              alt="Profile Preview"
-              width={64}
-              height={64}
-              className="w-16 h-16 rounded-full object-cover border-2 border-teal-400 shadow-sm"
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handlePhotoChange}
-              className="text-sm text-gray-700"
-            />
-          </div>
-
-          {error && (
-            <p className="text-red-600 text-center font-medium">{error}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-2 bg-gradient-to-r from-teal-400 to-pink-400 hover:from-teal-300 hover:to-pink-300 text-white py-2.5 rounded-xl font-semibold shadow-md transition-all duration-300"
-          >
-            {loading ? "Creating Account..." : "Sign Up"}
-          </button>
-        </form>
-
-        <p className="mt-4 text-center text-gray-700 text-sm">
-          Already have an account?{" "}
-          <a
-            href="/signin"
-            className="text-teal-600 hover:text-pink-500 font-semibold transition"
-          >
-            Sign In
-          </a>
-        </p>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

@@ -60,7 +60,6 @@ export default function Map() {
 
       if (!res.ok) throw new Error(`Failed to fetch stray data (${res.status})`);
       const data = await res.json();
-      console.log("Raw backend data:", data);
 
       const onlyStrays = data.filter(
         (item) => item.location_type === "stray_animal"
@@ -132,8 +131,6 @@ export default function Map() {
       const lat = parseFloat(stray.latitude);
       const lng = parseFloat(stray.longitude);
       if (isNaN(lat) || isNaN(lng)) return;
-
-      console.log(`Rendering marker for ${stray.name} (${lat}, ${lng})`);
 
       const marker = new google.maps.Marker({
         position: { lat, lng },
@@ -245,7 +242,6 @@ export default function Map() {
 
   useEffect(() => {
     if (strays.length) {
-      console.log("Updated strays:", strays);
       renderStrayMarkers(strays);
     }
   }, [strays]);

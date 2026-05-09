@@ -1,14 +1,18 @@
-
-
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { PawPrint, HeartHandshake, UserSearch, Store, MapPin, PawPrint as Paw } from "lucide-react";
+import {
+  PawPrint,
+  HeartHandshake,
+  UserSearch,
+  Store,
+  MapPin,
+  PawPrint as Paw,
+} from "lucide-react";
 import HeroSection from "./components/HeroSection";
 import Map from "./components/Map";
 import FullPageLoader from "./components/FullPageLoader";
 import Image from "next/image";
-
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 const RESCUE_API = `${API_BASE}/rescue-rep/`;
@@ -25,16 +29,16 @@ export default function Home() {
 
   const pageLoading = loadingRecs || nearbyLoading;
 
-
   // const token =
   //   typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
   const getToken = useCallback(
     () =>
-      typeof window !== "undefined" ? localStorage.getItem("access_token") : null,
-    []
+      typeof window !== "undefined"
+        ? localStorage.getItem("access_token")
+        : null,
+    [],
   );
-
 
   //  Safe nested property getter
   const safe = (obj, path, fallback) =>
@@ -59,7 +63,7 @@ export default function Home() {
         setLoadingRecs(false);
       }
     },
-    [getToken]
+    [getToken],
   );
 
   // Fetch adoption requests (for linking to recommendation data)
@@ -77,8 +81,6 @@ export default function Home() {
       console.error("Error fetching adoption requests:", err);
     }
   }, [getToken]);
-
-  
 
   // const fetchNearbyRescues = async (radiusKm = 10) => {
   //   const token = getToken();
@@ -153,11 +155,11 @@ export default function Home() {
         !("geolocation" in navigator)
       ) {
         console.warn(
-          "Geolocation not available here (needs HTTPS or localhost). Nearby alerts disabled."
+          "Geolocation not available here (needs HTTPS or localhost). Nearby alerts disabled.",
         );
         setNearbyLoading(false);
         setNearbyError(
-          "Location isn't available on this connection. Nearby alerts are disabled."
+          "Location isn't available on this connection. Nearby alerts are disabled.",
         );
         setNearbyMissions([]);
         return;
@@ -174,7 +176,7 @@ export default function Home() {
               `${RESCUE_API}nearby?lat=${latitude}&lon=${longitude}&radius_km=${radiusKm}`,
               {
                 headers: { Authorization: `Bearer ${token}` },
-              }
+              },
             );
 
             if (!res.ok) {
@@ -197,15 +199,11 @@ export default function Home() {
           setNearbyMissions([]);
           setNearbyLoading(false);
         },
-        { enableHighAccuracy: true }
+        { enableHighAccuracy: true },
       );
     },
-    [getToken]
+    [getToken],
   );
-
-
-
-
 
   // useEffect(() => {
   //   fetchRecommendedPets();
@@ -229,7 +227,6 @@ export default function Home() {
       cancelled = true;
     };
   }, [fetchRecommendedPets, fetchAdoptionReqs, fetchNearbyRescues]);
-
 
   // Start/Join rescue chat from Alerts section
   const startRescueFromAlert = async (mission) => {
@@ -321,7 +318,7 @@ export default function Home() {
       const chat = await res.json();
       window.open(
         `/adoptions/${chat.chatId}?adoptionReqId=${adoptionReqId}`,
-        "_blank"
+        "_blank",
       );
     } catch (err) {
       console.error("Error starting chat:", err);
@@ -371,13 +368,23 @@ export default function Home() {
           AI Recommended Pets for You
         </h1>
 
-        {loadingRecs && (
-          <p className="text-center text-gray-600 mb-4 animate-pulse">
-            🔄 Refreshing recommendations...
-          </p>
-        )}
-
         <div className="flex flex-wrap justify-center gap-6 p-6">
+          {loadingRecs &&
+            Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="w-80 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md"
+              >
+                <div className="h-56 animate-pulse bg-slate-200" />
+                <div className="space-y-3 p-5">
+                  <div className="h-5 w-2/3 animate-pulse rounded bg-slate-200" />
+                  <div className="h-4 w-1/2 animate-pulse rounded bg-slate-100" />
+                  <div className="h-4 w-full animate-pulse rounded bg-slate-100" />
+                  <div className="h-10 w-full animate-pulse rounded-full bg-orange-100" />
+                </div>
+              </div>
+            ))}
+
           {!loadingRecs && recommendedPets.length === 0 && (
             <div className="w-full max-w-2xl rounded-2xl border border-amber-200 bg-white/70 p-6 text-center shadow-sm">
               <p className="text-base font-semibold text-gray-800">
@@ -397,7 +404,7 @@ export default function Home() {
 
           {recommendedPets.map((pet) => {
             const req = adoptionReqs.find(
-              (r) => safe(r, ["pet", "pet_id"], null) === pet.pet_id
+              (r) => safe(r, ["pet", "pet_id"], null) === pet.pet_id,
             );
             if (!req) return null;
 
@@ -405,8 +412,8 @@ export default function Home() {
               req.status === "Completed"
                 ? "bg-green-100 text-green-700 border border-green-400"
                 : req.status === "Pending"
-                ? "bg-yellow-100 text-yellow-700 border border-yellow-400"
-                : "bg-blue-100 text-blue-700 border border-blue-400";
+                  ? "bg-yellow-100 text-yellow-700 border border-yellow-400"
+                  : "bg-blue-100 text-blue-700 border border-blue-400";
 
             return (
               <div
@@ -488,7 +495,7 @@ export default function Home() {
           </div>
 
           {/* Alerts – now powered by nearby rescue missions */}
-          
+
           <div className="basis-1/2 p-4 flex flex-col">
             <h1 className="text-black text-2xl font-bold mb-4">
               Rescue Alerts Near You
@@ -497,25 +504,35 @@ export default function Home() {
             {/* only this part scrolls */}
             {/* <div className="flex-1 overflow-y-auto"> */}
             <div className="overflow-y-auto" style={{ height: "400px" }}>
-
               {nearbyLoading && (
-                <p className="text-sm text-gray-700">Loading nearby alerts...</p>
+                <div className="space-y-4">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="rounded-lg bg-white p-4 shadow">
+                      <div className="mb-3 h-4 w-24 animate-pulse rounded bg-slate-100" />
+                      <div className="mb-2 h-5 w-36 animate-pulse rounded bg-slate-200" />
+                      <div className="mb-2 h-4 w-20 animate-pulse rounded bg-red-100" />
+                      <div className="h-4 w-full animate-pulse rounded bg-slate-100" />
+                    </div>
+                  ))}
+                </div>
               )}
 
               {nearbyError && (
                 <p className="text-sm text-red-600 mb-3">{nearbyError}</p>
               )}
 
-              {!nearbyLoading && !nearbyError && nearbyMissions.length === 0 && (
-                <div className="rounded-2xl border border-amber-200 bg-white/80 p-5 text-sm text-gray-700 shadow-sm">
-                  <p className="text-base font-semibold text-gray-800">
-                    No rescue alerts nearby
-                  </p>
-                  <p className="mt-1 text-sm text-gray-600">
-                    Check back soon or open the map to explore other areas.
-                  </p>
-                </div>
-              )}
+              {!nearbyLoading &&
+                !nearbyError &&
+                nearbyMissions.length === 0 && (
+                  <div className="rounded-2xl border border-amber-200 bg-white/80 p-5 text-sm text-gray-700 shadow-sm">
+                    <p className="text-base font-semibold text-gray-800">
+                      No rescue alerts nearby
+                    </p>
+                    <p className="mt-1 text-sm text-gray-600">
+                      Check back soon or open the map to explore other areas.
+                    </p>
+                  </div>
+                )}
 
               <div className="space-y-4">
                 {nearbyMissions.slice(0, 10).map((mission) => (
@@ -552,11 +569,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-
-
-
-
-
         </div>
       </section>
     </div>

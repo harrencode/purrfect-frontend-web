@@ -4,7 +4,12 @@ import { useState } from "react";
 import { MapPin, PawPrint, X } from "lucide-react";
 import Image from "next/image";
 
-export default function RescueMissions({ missions = [], loading, error, refresh }) {
+export default function RescueMissions({
+  missions = [],
+  loading,
+  error,
+  refresh,
+}) {
   const [buttonLoading, setButtonLoading] = useState({});
   const [selectedMission, setSelectedMission] = useState(null);
 
@@ -50,7 +55,8 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
           },
           body: JSON.stringify({
             chat_id: chatId,
-            status: mission.status === "Pending" ? "InProgress" : mission.status,
+            status:
+              mission.status === "Pending" ? "InProgress" : mission.status,
           }),
         });
 
@@ -76,7 +82,6 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Loading rescues...</p>;
   if (error) return <p className="text-center mt-10 text-red-600">{error}</p>;
 
   return (
@@ -85,7 +90,30 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
         All Rescue Missions
       </h2>
 
-      {missions.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index}
+              className="rounded-2xl border border-amber-100 bg-white p-4 shadow-md"
+            >
+              <div className="mb-4 flex justify-between gap-3">
+                <div className="h-7 w-28 animate-pulse rounded bg-red-100" />
+                <div className="h-7 w-24 animate-pulse rounded bg-amber-100" />
+              </div>
+              <div className="space-y-3">
+                <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200" />
+                <div className="h-4 w-full animate-pulse rounded bg-slate-100" />
+                <div className="h-4 w-5/6 animate-pulse rounded bg-slate-100" />
+              </div>
+              <div className="mt-5 flex gap-3">
+                <div className="h-10 w-36 animate-pulse rounded-full bg-blue-100" />
+                <div className="h-10 w-28 animate-pulse rounded-full bg-slate-200" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : missions.length === 0 ? (
         <div className="rounded-2xl border border-amber-200 bg-white/80 p-6 text-center shadow-sm">
           <p className="text-base font-semibold text-gray-800">
             No rescue missions yet
@@ -114,8 +142,8 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
                     mission.alert_type === "Critical"
                       ? "bg-red-600 text-white"
                       : mission.alert_type === "High"
-                      ? "bg-yellow-400 text-black"
-                      : "bg-gray-400 text-black"
+                        ? "bg-yellow-400 text-black"
+                        : "bg-gray-400 text-black"
                   }`}
                 >
                   {mission.alert_type} Alert
@@ -126,8 +154,8 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
                     mission.status === "Pending"
                       ? "bg-red-400 text-white"
                       : mission.status === "InProgress"
-                      ? "bg-yellow-300 text-black"
-                      : "bg-green-400 text-white"
+                        ? "bg-yellow-300 text-black"
+                        : "bg-green-400 text-white"
                   }`}
                 >
                   {mission.status}
@@ -179,37 +207,59 @@ export default function RescueMissions({ missions = [], loading, error, refresh 
 
       {/* Modal */}
       {selectedMission && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 text-black">
-          <div className="bg-white rounded-xl p-6 relative max-w-lg w-full">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 text-black backdrop-blur-sm">
+          <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/70 bg-white shadow-2xl shadow-slate-950/25">
             <button
               onClick={() => setSelectedMission(null)}
-              className="absolute top-3 right-3 text-gray-700 hover:text-black"
+              className="absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-sm ring-1 ring-slate-200 transition hover:bg-white hover:text-slate-900"
+              aria-label="Close mission details"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
 
-            <h3 className="text-lg font-semibold mb-3 text-[#9b6241]">
-              Mission Details
-            </h3>
-
             {selectedMission.photo && (
-              <Image
-                src={
-                  selectedMission.photo.startsWith("http")
-                    ? selectedMission.photo
-                    : `${API_BASE}${selectedMission.photo}`
-                }
-                alt="Rescue mission"
-                width={640}
-                height={256}
-                className="w-full h-64 object-cover rounded-lg mb-4"
-              />
+              <div className="h-64 w-full bg-slate-100">
+                <Image
+                  src={
+                    selectedMission.photo.startsWith("http")
+                      ? selectedMission.photo
+                      : `${API_BASE}${selectedMission.photo}`
+                  }
+                  alt="Rescue mission"
+                  width={640}
+                  height={256}
+                  className="h-full w-full object-cover"
+                />
+              </div>
             )}
 
-            <p><strong>Location:</strong> {selectedMission.location}</p>
-            <p><strong>Description:</strong> {selectedMission.description}</p>
-            <p><strong>Status:</strong> {selectedMission.status}</p>
-            <p><strong>Reported by:</strong> {selectedMission.userFirstName}</p>
+            <div className="p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">
+                Rescue mission
+              </p>
+              <h3 className="mt-1 text-xl font-semibold text-slate-950">
+                Mission Details
+              </h3>
+
+              <div className="mt-5 space-y-3 text-sm text-slate-700">
+                <p>
+                  <strong className="text-slate-950">Location:</strong>{" "}
+                  {selectedMission.location}
+                </p>
+                <p>
+                  <strong className="text-slate-950">Description:</strong>{" "}
+                  {selectedMission.description}
+                </p>
+                <p>
+                  <strong className="text-slate-950">Status:</strong>{" "}
+                  {selectedMission.status}
+                </p>
+                <p>
+                  <strong className="text-slate-950">Reported by:</strong>{" "}
+                  {selectedMission.userFirstName || "Unknown"}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}

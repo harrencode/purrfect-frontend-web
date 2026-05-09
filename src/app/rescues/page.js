@@ -1,16 +1,14 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { HeartHandshake, Search } from "lucide-react";
+import { HeartHandshake, Search, X } from "lucide-react";
 import RescueMissions from "../components/RescueMissions";
 import RescueReportForm from "../components/RescueReportForm";
 import RescueMissionsNearby from "../components/RescueMissionsNearby";
 import FullPageLoader from "../components/FullPageLoader";
 
-
 export default function Rescues() {
   const [showForm, setShowForm] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
-
 
   // const [missions, setMissions] = useState([]);
   // const [nearby, setNearby] = useState([]);
@@ -24,7 +22,6 @@ export default function Rescues() {
   const [errorMissions, setErrorMissions] = useState("");
   const [errorNearby, setErrorNearby] = useState("");
 
-
   // const [loading, setLoading] = useState(true);
   // const [error, setError] = useState("");
 
@@ -37,12 +34,13 @@ export default function Rescues() {
 
   const getToken = useCallback(
     () =>
-      typeof window !== "undefined" ? localStorage.getItem("access_token") : null,
-    []
+      typeof window !== "undefined"
+        ? localStorage.getItem("access_token")
+        : null,
+    [],
   );
 
   /** Fetch all user rescue reports */
- 
 
   const fetchMissions = useCallback(async () => {
     const token = getToken();
@@ -76,10 +74,6 @@ export default function Rescues() {
     }
   }, [API_URL, getToken]);
 
-
-  
-
-
   /** Fetch nearby rescue reports based on user location */
   const fetchNearby = useCallback(async () => {
     const token = getToken();
@@ -108,7 +102,7 @@ export default function Rescues() {
         try {
           const res = await fetch(
             `${API_URL}nearby?lat=${latitude}&lon=${longitude}&radius_km=${radius}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           );
 
           if (!res.ok) throw new Error(`Failed to fetch nearby: ${res.status}`);
@@ -129,14 +123,9 @@ export default function Rescues() {
         setNearby([]);
         setLoadingNearby(false);
       },
-      { enableHighAccuracy: true }
+      { enableHighAccuracy: true },
     );
   }, [API_URL, getToken, radius]);
-
-
-
-
-
 
   /** Fetch both on mount (first load) */
   useEffect(() => {
@@ -184,7 +173,7 @@ export default function Rescues() {
     // <div>
     <div className="relative">
       {pageLoading && <FullPageLoader />}
-      
+
       {/* Hero Section (updated to match home hero background style) */}
       <section className="relative w-full min-h-[400px] overflow-hidden flex items-center">
         {/* Background */}
@@ -244,7 +233,6 @@ export default function Rescues() {
         </div>
       </section>
 
-
       {/* Nearby Missions */}
       {/* <RescueMissionsNearby missions={nearby} loading={loading} error={error} refresh={fetchNearby} /> */}
 
@@ -265,7 +253,6 @@ export default function Rescues() {
         refresh={fetchMissions}
       />
 
-
       {/* Rescue Report Modal */}
       {showForm && (
         <RescueReportForm
@@ -276,35 +263,51 @@ export default function Rescues() {
 
       {/* Advanced Search Modal */}
       {showAdvanced && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 text-black">
-          <div className="bg-white rounded-xl p-6 w-96 shadow-lg">
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">
-              Advanced Search
-            </h3>
-            <label className="block text-sm text-gray-700 mb-2">
-              Search radius (km)
-            </label>
-            <input
-              type="number"
-              value={radius}
-              onChange={(e) => setRadius(Number(e.target.value))}
-              min="1"
-              max="100"
-              className="w-full border rounded p-2 mb-4"
-            />
-            <div className="flex justify-end gap-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 text-black backdrop-blur-sm">
+          <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/70 bg-white shadow-2xl shadow-slate-950/25">
+            <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-500">
+                  Nearby rescues
+                </p>
+                <h3 className="mt-1 flex items-center gap-2 text-lg font-semibold text-slate-950">
+                  <Search size={18} /> Advanced Search
+                </h3>
+              </div>
               <button
                 onClick={() => setShowAdvanced(false)}
-                className="px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-400 transition"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                aria-label="Close advanced search"
               >
-                Cancel
+                <X size={18} />
               </button>
-              <button
-                onClick={handleApplySearch}
-                className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
-              >
-                Apply
-              </button>
+            </div>
+            <div className="px-6 py-5">
+              <label className="block text-sm text-gray-700 mb-2">
+                Search radius (km)
+              </label>
+              <input
+                type="number"
+                value={radius}
+                onChange={(e) => setRadius(Number(e.target.value))}
+                min="1"
+                max="100"
+                className="mb-4 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
+              />
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowAdvanced(false)}
+                  className="rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleApplySearch}
+                  className="rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
+                >
+                  Apply
+                </button>
+              </div>
             </div>
           </div>
         </div>

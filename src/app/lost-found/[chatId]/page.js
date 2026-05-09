@@ -52,7 +52,6 @@ export default function LostPetChatPage() {
     if (!token) return;
 
     const payload = decodeJwt(token);
-    // console.log("JWT payload:", payload);
 
     const uid = payload?.id ?? payload?.user_id ?? payload?.sub;
     setCurrentUserId(uid ?? null);
@@ -84,7 +83,6 @@ export default function LostPetChatPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        console.log("🐾 Lost Pet Report:", data); // debug output
         setLostPetReport(data);
       } else {
         console.error("Failed to fetch lost pet report:", res.status);

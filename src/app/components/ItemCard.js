@@ -48,9 +48,21 @@ export default function ItemCard({ onInitialLoadComplete }) {
 
       {/* Loading / error / empty states */}
       {loading && items.length === 0 && (
-        <p className="text-center text-gray-600 mb-4">
-          Loading products...
-        </p>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index}
+              className="overflow-hidden rounded-lg bg-white shadow-md"
+            >
+              <div className="h-48 animate-pulse bg-slate-200" />
+              <div className="space-y-3 p-4 text-center">
+                <div className="mx-auto h-5 w-2/3 animate-pulse rounded bg-slate-200" />
+                <div className="mx-auto h-4 w-1/3 animate-pulse rounded bg-slate-100" />
+                <div className="mx-auto h-3 w-1/2 animate-pulse rounded bg-emerald-100" />
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {!loading && error && (
@@ -125,10 +137,7 @@ export default function ItemCard({ onInitialLoadComplete }) {
       )}
 
       {selected && (
-        <ProductModal
-          product={selected}
-          onClose={() => setSelected(null)}
-        />
+        <ProductModal product={selected} onClose={() => setSelected(null)} />
       )}
     </section>
   );

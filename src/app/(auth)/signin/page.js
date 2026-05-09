@@ -69,12 +69,8 @@ export default function SignIn() {
       });
 
       const data = await response.json();
-      console.log("Login response data:", data);
-      console.log("Response status:", response.status);
-      console.log("detail field:", data?.detail?.code);
       // Redirect if email not verified
       if (response.status === 403 && data?.detail?.code === "EMAIL_NOT_VERIFIED") {
-        console.log("Email not verified, redirecting to verification page.");
         router.replace(`/verify-account?email=${encodeURIComponent(data.detail.email || form.email)}`);
 
         return;
@@ -101,7 +97,6 @@ export default function SignIn() {
           data.refresh_token,
           data.refresh_expires_in,
         );
-        console.log("Login successful. Token stored.");
         router.push("/");
       } else {
         throw new Error("Login failed — token missing");

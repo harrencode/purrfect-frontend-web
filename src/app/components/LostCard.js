@@ -43,23 +43,30 @@ export default function LostCard() {
 
   if (loading)
     return (
-      <div className="py-12 text-center text-gray-500">
-        <div className="animate-pulse flex justify-center mb-4">
-          <div className="w-12 h-12 bg-amber-300 rounded-full" />
-        </div>
-        <p className="text-lg font-medium">Loading lost pets...</p>
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="overflow-hidden rounded-2xl border border-amber-200 bg-white/80 shadow-sm"
+          >
+            <div className="h-48 animate-pulse bg-slate-200" />
+            <div className="space-y-3 p-5">
+              <div className="h-5 w-2/3 animate-pulse rounded bg-slate-200" />
+              <div className="h-4 w-1/2 animate-pulse rounded bg-slate-100" />
+              <div className="h-4 w-full animate-pulse rounded bg-slate-100" />
+              <div className="h-9 w-full animate-pulse rounded-lg bg-emerald-100" />
+            </div>
+          </div>
+        ))}
       </div>
     );
 
-  if (error)
-    return <p className="text-center text-red-500 py-8">{error}</p>;
+  if (error) return <p className="text-center text-red-500 py-8">{error}</p>;
 
   if (!pets.length)
     return (
       <div className="mx-auto my-8 w-full max-w-2xl rounded-2xl border border-amber-200 bg-white/80 p-6 text-center shadow-sm">
-        <p className="text-base font-semibold text-gray-800">
-          No reports yet
-        </p>
+        <p className="text-base font-semibold text-gray-800">No reports yet</p>
         <p className="mt-1 text-sm text-gray-600">
           Be the first to report a lost or found pet.
         </p>
@@ -108,7 +115,7 @@ export default function LostCard() {
             {/* Status Badge */}
             <span
               className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full pointer-events-none ${getStatusClasses(
-                pet.status
+                pet.status,
               )}`}
             >
               {pet.status || "Unknown"}

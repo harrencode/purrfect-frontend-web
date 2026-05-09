@@ -25,6 +25,16 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 
 @keyframes loaderSlide {
   0% {
@@ -38,59 +48,73 @@ body {
   }
 }
 
-
 /* improved modal styling */
 .improved-modal {
-  background: #ffffff;
-  padding: 2rem 2.5rem;
-  border-radius: 1.2rem;
-  max-width: 420px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  padding: 2.25rem;
+  border-radius: 1rem;
+  max-width: 430px;
   width: 90%;
   text-align: center;
-  color: #1a1a1a; /* dark text */
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #172033;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.25);
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  animation: modalIn 180ms ease-out;
+}
+
+.improved-modal::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, #10b981, #f59e0b, #ec4899);
 }
 
 .modal-title {
   margin-bottom: 0.8rem;
   font-size: 1.45rem;
   font-weight: 700;
-  color: #111; /* DARK title */
+  color: #0f172a;
 }
 
 .modal-message {
   margin-bottom: 1.6rem;
   font-size: 0.98rem;
   line-height: 1.45rem;
-  color: #333; /* dark but softer */
+  color: #475569;
 }
 
 .modal-button {
-  padding: 0.65rem 1.5rem;
+  padding: 0.75rem 1.6rem;
   border-radius: 999px;
   border: none;
-  background: #000;
+  background: #111827;
   color: #fff;
   font-weight: 600;
   cursor: pointer;
   font-size: 0.95rem;
-  transition: all 0.15s ease-in-out;
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.18);
+  transition:
+    transform 0.15s ease-in-out,
+    background 0.15s ease-in-out;
 }
 
 .modal-button:hover {
-  background: #333;
+  background: #1f2937;
   transform: translateY(-1px);
 }
 
 .session-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(6px);
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1rem;
   z-index: 9999; /* VERY IMPORTANT */
 }
 

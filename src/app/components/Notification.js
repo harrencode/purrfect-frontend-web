@@ -11,7 +11,6 @@ export default function Notifications({ wsUrl }) {
     if (!token) return;
     const url = `${wsUrl}?token=${token}`;
     const ws = new WebSocket(url);
-    ws.onopen = () => console.log("Notification WS connected");
     ws.onmessage = (ev) => {
       try {
         const data = JSON.parse(ev.data);
@@ -20,7 +19,6 @@ export default function Notifications({ wsUrl }) {
         }
       } catch (e) {}
     };
-    ws.onclose = () => console.log("ws closed");
     setSocket(ws);
     return () => ws.close();
   }, [wsUrl]);

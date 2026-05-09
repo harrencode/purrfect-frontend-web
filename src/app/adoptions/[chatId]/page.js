@@ -56,7 +56,6 @@ export default function AdoptionChatPage() {
   useEffect(() => {
     if (!token) return;
     const payload = decodeJwt(token);
-    console.log("JWT payload:", payload);
 
     // FastAPI often uses `sub`
     const uid = payload?.id ?? payload?.user_id ?? payload?.sub;

@@ -42,7 +42,6 @@ export default function Leaderboard() {
         if (!res.ok) throw new Error("Failed to fetch user info");
 
         const user = await res.json();
-        console.log("Fetched current user:", user);
 
         if (user.first_name && user.last_name) {
           setCurrentUserName(`${user.first_name} ${user.last_name}`);

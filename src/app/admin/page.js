@@ -209,8 +209,6 @@ export default function AdminDashboardPage() {
   // Lost & Found delete – takes the whole row, resolves the correct id inside
   async function deleteLostReport(row) {
     const id = row.report_id ?? row.id;
-    console.log("deleteLostReport row:", row, "resolved id:", id);
-
     if (!id) {
       console.error("deleteLostReport: could not resolve id from row");
       setError("Cannot delete lost report: missing id");
@@ -247,8 +245,6 @@ export default function AdminDashboardPage() {
   // Rescue delete
   async function deleteRescueReport(row) {
     const id = row.report_id ?? row.id;
-    console.log("deleteRescueReport row:", row, "resolved id:", id);
-
     if (!id) {
       console.error("deleteRescueReport: could not resolve id from row");
       setError("Cannot delete rescue report: missing id");
@@ -284,8 +280,6 @@ export default function AdminDashboardPage() {
   // Adoption delete
   async function deleteAdoptionReq(row) {
     const id = row.adopt_id ?? row.id;
-    console.log("deleteAdoptionReq row:", row, "resolved id:", id);
-
     if (!id) {
       console.error("deleteAdoptionReq: could not resolve id from row");
       setError("Cannot delete adoption request: missing id");

@@ -1,288 +1,18 @@
-// "use client";
-// import { useState } from "react";
-// import dynamic from "next/dynamic";
-// // import { geocodeAddress } from "../lib/useGeocoder";
-
-// const MapPicker = dynamic(() => import("./MapPicker"), { ssr: false });
-
-// export default function FormModal({ type, onClose }) {
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     description: "",
-//     contact_info: "",
-//     address: "",
-//     latitude: "",
-//     longitude: "",
-//   });
-
-//   const [showMap, setShowMap] = useState(false);
-//   const [finding, setFinding] = useState(false);
-//   const [addressError, setAddressError] = useState("");
-//   const [mapCenter, setMapCenter] = useState(null);
-
-//   const API_URL = process.env.NEXT_PUBLIC_API_URL;
-//   const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-
-//   const typeMap = {
-//     StrayAnimal: "stray_animal",
-//     RescueHome: "rescue_home",
-//     VetCenter: "vet_center",
-//   };
-
-//   const handleChange = (e) => {
-//     setAddressError("");
-//     setFormData((prev) => ({
-//       ...prev,
-//       [e.target.name]: e.target.value,
-//     }));
-//   };
-
-//   const getPlusCode = async (lat, lng) => {
-//     try {
-//       const res = await fetch(
-//         `https://plus.codes/api?address=${lat},${lng}&key=${GOOGLE_API_KEY}`
-//       );
-//       const data = await res.json();
-//       return data?.plus_code?.global_code || "";
-//     } catch {
-//       return "";
-//     }
-//   };
-
-//   const handleUseCurrentLocation = () => {
-//     if (!navigator.geolocation) {
-//       alert("Geolocation not supported");
-//       return;
-//     }
-
-//     navigator.geolo cation.getCurrentPosition(
-//       async (pos) => {
-//         const lat = pos.coords.latitude;
-//         const lng = pos.coords.longitude;
-//         const plus = await getPlusCode(lat, lng);
-//         setFormData((prev) => ({
-//           ...prev,
-//           latitude: lat.toFixed(6),
-//           longitude: lng.toFixed(6),
-//           address: plus || `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-//         }));
-//       },
-//       (err) => alert("Failed: " + err.message)
-//     );
-//   };
-
-//   const handleFindFromAddress = async () => {
-//     setAddressError("");
-//     if (!formData.address.trim()) {
-//       setAddressError("Please type an address.");
-//       return;
-//     }
-
-//     setFinding(true);
-//     try {
-//       const result = await geocodeAddress(formData.address);
-//       const plus = await getPlusCode(result.lat, result.lng);
-//       setFormData((prev) => ({
-//         ...prev,
-//         latitude: result.lat.toFixed(6),
-//         longitude: result.lng.toFixed(6),
-//         address: plus || prev.address,
-//       }));
-//       setMapCenter({ lat: result.lat, lng: result.lng });
-//     } catch (err) {
-//       setAddressError(err.message || "Failed to find address");
-//     } finally {
-//       setFinding(false);
-//     }
-//   };
-
-//   const handleMapSelect = async ({ lat, lng }) => {
-//     const plus = await getPlusCode(lat, lng);
-//     setFormData((prev) => ({
-//       ...prev,
-//       latitude: lat.toFixed(6),
-//       longitude: lng.toFixed(6),
-//       address: plus || `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-//     }));
-//     setShowMap(false);
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (!formData.latitude || !formData.longitude) {
-//       alert("Please select a valid location before saving.");
-//       return;
-//     }
-
-//     try {
-//       const token = localStorage.getItem("access_token");
-
-//       // const payload = {
-//       //   description: formData.description || null,
-//       //   latitude: parseFloat(formData.latitude),
-//       //   longitude: parseFloat(formData.longitude),
-//       //   location_type: typeMap[type],
-//       // };
-
-
-//       const payload = {
-//         name:
-//           type === "StrayAnimal"
-//             ? "Stray animal report" // default name so backend passes validation
-//             : (formData.name?.trim() || ""),
-
-//         description: formData.description || null,
-//         contact_info: formData.contact_info?.trim() || null,
-//         latitude: parseFloat(formData.latitude),
-//         longitude: parseFloat(formData.longitude),
-//         location_type: typeMap[type],
-// };
-
-
-//       // Only include name/contact_info if not a StrayAnimal
-//       // if (type !== "StrayAnimal") {
-//       //   payload.name = formData.name || null;
-//       //   payload.contact_info = formData.contact_info || null;
-//       // }
-
-//       const res = await fetch(`${API_URL}/stray-map/`, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Accept: "application/json",
-//           ...(token ? { Authorization: `Bearer ${token}` } : {}),
-//         },
-//         body: JSON.stringify(payload),
-//       });
-
-//       if (!res.ok) throw new Error(`Failed to save (${res.status})`);
-//       alert("Data saved successfully!");
-//       onClose();
-//     } catch (err) {
-//       alert(err.message || "Error saving data");
-//     }
-//   };
-
-//   const coordsSet = !!(formData.latitude && formData.longitude);
-
-//   return (
-//     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
-//       <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg text-black">
-//         <h2 className="text-xl font-bold mb-4 capitalize">
-//           Add {type.replace("_", " ")}
-//         </h2>
-
-//         <form onSubmit={handleSubmit} className="space-y-3">
-//           {/* Only show name and contact_info for non-StrayAnimal types */}
-//           {type !== "StrayAnimal" && (
-//             <>
-//               <input
-//                 name="name"
-//                 placeholder="Name"
-//                 onChange={handleChange}
-//                 required
-//                 className="w-full border rounded p-2"
-//               />
-//               <input
-//                 name="contact_info"
-//                 placeholder="Contact Info"
-//                 onChange={handleChange}
-//                 className="w-full border rounded p-2"
-//               />
-//             </>
-//           )}
-
-//           <textarea
-//             name="description"
-//             placeholder="Description"
-//             onChange={handleChange}
-//             className="w-full border rounded p-2"
-//           />
-
-//           <div>
-//             <label className="text-sm font-medium">
-//               Location (Plus Code / Address)
-//             </label>
-//             <div className="flex gap-2 mt-1">
-//               <input
-//                 name="address"
-//                 value={formData.address}
-//                 onChange={handleChange}
-//                 className="flex-1 border rounded p-2"
-//                 placeholder="Type or auto-filled Plus Code"
-//               />
-//               <button
-//                 type="button"
-//                 onClick={handleFindFromAddress}
-//                 disabled={finding}
-//                 className="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-//               >
-//                 {finding ? "..." : "Find"}
-//               </button>
-//             </div>
-//             {addressError && (
-//               <p className="text-red-600 text-sm">{addressError}</p>
-//             )}
-
-//             <div className="flex gap-2 mt-3">
-//               <button
-//                 type="button"
-//                 onClick={handleUseCurrentLocation}
-//                 className="flex-1 px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-//               >
-//                 Use Current
-//               </button>
-//               <button
-//                 type="button"
-//                 onClick={() => setShowMap(true)}
-//                 className="flex-1 px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-//               >
-//                 Pick on Map
-//               </button>
-//             </div>
-//           </div>
-
-//           <div className="flex justify-end space-x-3 mt-4">
-//             <button
-//               type="button"
-//               onClick={onClose}
-//               className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-//             >
-//               Cancel
-//             </button>
-//             <button
-//               type="submit"
-//               disabled={!coordsSet}
-//               className={`px-4 py-2 text-white rounded ${
-//                 coordsSet ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-300"
-//               }`}
-//             >
-//               Save
-//             </button>
-//           </div>
-//         </form>
-//       </div>
-
-//       {showMap && (
-//         <MapPicker
-//           onSelect={handleMapSelect}
-//           onClose={() => setShowMap(false)}
-//           initialCenter={mapCenter}
-//         />
-//       )}
-//     </div>
-//   );
-// }
-
-
-
-
 "use client";
-import { useState, useRef } from "react";
+
+import { useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
+import { LocateFixed, MapPin, Navigation, Save, X } from "lucide-react";
 
 const MapPicker = dynamic(() => import("./MapPicker"), { ssr: false });
+const GOOGLE_LIBRARIES = ["places"];
+
+const typeLabels = {
+  StrayAnimal: "Stray Animal",
+  RescueHome: "Rescue Home",
+  VetCenter: "Vet Center",
+};
 
 export default function FormModal({ type, onClose }) {
   const [formData, setFormData] = useState({
@@ -293,7 +23,6 @@ export default function FormModal({ type, onClose }) {
     latitude: "",
     longitude: "",
   });
-
   const [showMap, setShowMap] = useState(false);
   const [addressError, setAddressError] = useState("");
   const [mapCenter, setMapCenter] = useState(null);
@@ -305,7 +34,7 @@ export default function FormModal({ type, onClose }) {
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_API_KEY,
-    libraries: ["places"],
+    libraries: GOOGLE_LIBRARIES,
   });
 
   const typeMap = {
@@ -321,9 +50,13 @@ export default function FormModal({ type, onClose }) {
 
   const getPlusCode = async (lat, lng) => {
     try {
-      const res = await fetch(`https://plus.codes/api?address=${lat},${lng}&email=noreply@demo.com`);
+      const res = await fetch(
+        `https://plus.codes/api?address=${lat},${lng}&email=noreply@demo.com`,
+      );
       const data = await res.json();
-      return data?.plus_code?.global_code || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      return (
+        data?.plus_code?.global_code || `${lat.toFixed(6)}, ${lng.toFixed(6)}`
+      );
     } catch {
       return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
     }
@@ -344,9 +77,8 @@ export default function FormModal({ type, onClose }) {
       ...prev,
       latitude: lat.toFixed(6),
       longitude: lng.toFixed(6),
-      address: plus, // store plus code (or store place.formatted_address if you want)
+      address: plus,
     }));
-
     setMapCenter({ lat, lng });
   };
 
@@ -366,7 +98,7 @@ export default function FormModal({ type, onClose }) {
         }));
         setMapCenter({ lat, lng });
       },
-      (err) => alert("Failed: " + err.message)
+      (err) => alert("Failed: " + err.message),
     );
   };
 
@@ -390,9 +122,11 @@ export default function FormModal({ type, onClose }) {
     }
 
     const token = localStorage.getItem("access_token");
-
     const payload = {
-      name: type === "StrayAnimal" ? "Stray animal report" : (formData.name?.trim() || ""),
+      name:
+        type === "StrayAnimal"
+          ? "Stray animal report"
+          : formData.name?.trim() || "",
       description: formData.description || null,
       contact_info: formData.contact_info?.trim() || null,
       latitude: parseFloat(formData.latitude),
@@ -423,31 +157,72 @@ export default function FormModal({ type, onClose }) {
   const coordsSet = !!(formData.latitude && formData.longitude);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
-      <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg text-black">
-        <h2 className="text-xl font-bold mb-4 capitalize">Add {type.replace("_", " ")}</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+      <div className="max-h-[88vh] w-full max-w-md overflow-hidden rounded-2xl border border-white/70 bg-white text-slate-900 shadow-2xl shadow-slate-950/25">
+        <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">
+              Map report
+            </p>
+            <h2 className="mt-1 text-xl font-bold text-slate-950">
+              Add {typeLabels[type] || type}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+            aria-label="Close form"
+          >
+            <X size={18} />
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form
+          onSubmit={handleSubmit}
+          className="max-h-[calc(88vh-82px)] space-y-4 overflow-y-auto px-6 py-5"
+        >
           {type !== "StrayAnimal" && (
-            <>
-              <input name="name" placeholder="Name" onChange={handleChange} required className="w-full border rounded p-2" />
-              <input name="contact_info" placeholder="Contact Info" onChange={handleChange} className="w-full border rounded p-2" />
-            </>
+            <div className="grid gap-3">
+              <input
+                name="name"
+                placeholder="Name"
+                onChange={handleChange}
+                required
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+              />
+              <input
+                name="contact_info"
+                placeholder="Contact info"
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+              />
+            </div>
           )}
 
-          <textarea name="description" placeholder="Description" onChange={handleChange} className="w-full border rounded p-2" />
+          <textarea
+            name="description"
+            placeholder="Description"
+            onChange={handleChange}
+            rows={4}
+            className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+          />
 
           <div>
-            <label className="text-sm font-medium">Location (Search / Plus Code)</label>
+            <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
+              <MapPin size={16} /> Location
+            </label>
 
             {isLoaded ? (
-              <Autocomplete onLoad={(ac) => (autocompleteRef.current = ac)} onPlaceChanged={handlePlaceChanged}>
+              <Autocomplete
+                onLoad={(ac) => (autocompleteRef.current = ac)}
+                onPlaceChanged={handlePlaceChanged}
+              >
                 <input
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  className="w-full border rounded p-2"
-                  placeholder="Type and pick a place from the list"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+                  placeholder="Search and pick a place"
                 />
               </Autocomplete>
             ) : (
@@ -455,35 +230,67 @@ export default function FormModal({ type, onClose }) {
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                className="w-full border rounded p-2"
-                placeholder="Loading Google…"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none placeholder:text-slate-400"
+                placeholder="Loading Google..."
               />
             )}
 
-            {addressError && <p className="text-red-600 text-sm">{addressError}</p>}
+            {addressError && (
+              <p className="mt-2 text-sm font-medium text-red-600">
+                {addressError}
+              </p>
+            )}
 
-            <div className="flex gap-2 mt-3">
-              <button type="button" onClick={handleUseCurrentLocation} className="flex-1 px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                Use Current
+            {coordsSet && (
+              <div className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs font-medium text-emerald-800">
+                Selected: {formData.latitude}, {formData.longitude}
+              </div>
+            )}
+
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={handleUseCurrentLocation}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+              >
+                <LocateFixed size={16} /> Use Current
               </button>
-              <button type="button" onClick={() => setShowMap(true)} className="flex-1 px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
-                Pick on Map
+              <button
+                type="button"
+                onClick={() => setShowMap(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
+              >
+                <Navigation size={16} /> Pick on Map
               </button>
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 mt-4">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+          <div className="flex gap-3 border-t border-slate-100 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+            >
               Cancel
             </button>
-            <button type="submit" disabled={!coordsSet} className={`px-4 py-2 text-white rounded ${coordsSet ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-300"}`}>
-              Save
+            <button
+              type="submit"
+              disabled={!coordsSet}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+            >
+              <Save size={16} /> Save
             </button>
           </div>
         </form>
       </div>
 
-      {showMap && <MapPicker onSelect={handleMapSelect} onClose={() => setShowMap(false)} initialCenter={mapCenter} />}
+      {showMap && (
+        <MapPicker
+          onSelect={handleMapSelect}
+          onClose={() => setShowMap(false)}
+          initialCenter={mapCenter}
+        />
+      )}
     </div>
   );
 }

@@ -106,8 +106,6 @@ export default function Example() {
           if (!res.ok) {
             const data = await res.json().catch(() => null);
             console.error("Failed to trigger nearby notifications:", data || res.statusText);
-          } else {
-            console.log("Nearby notifications triggered");
           }
         } catch (err) {
           console.error("Error sending location:", err);

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { PawPrint } from "lucide-react";
-import FullPageLoader from "../components/FullPageLoader"; 
+import { PawPrint, SlidersHorizontal, Upload, X } from "lucide-react";
+import FullPageLoader from "../components/FullPageLoader";
 import Image from "next/image";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
@@ -12,7 +12,7 @@ export default function Adopts() {
   const [adoptionReqs, setAdoptionReqs] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [loadingRecs, setLoadingRecs] = useState(false); 
+  const [loadingRecs, setLoadingRecs] = useState(false);
   const [myAdoptionReqs, setMyAdoptionReqs] = useState([]);
 
   const [pageLoading, setPageLoading] = useState(true);
@@ -48,9 +48,7 @@ export default function Adopts() {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
- 
   // Fetch Functions
-
 
   const fetchRecommendedPets = useCallback(
     async (top_k = 4) => {
@@ -69,7 +67,7 @@ export default function Adopts() {
         setLoadingRecs(false);
       }
     },
-    [token]
+    [token],
   );
 
   const fetchAdoptionReqs = useCallback(async () => {
@@ -99,7 +97,6 @@ export default function Adopts() {
       console.error(err);
     }
   }, [token]);
-
 
   const fetchUserPreferences = async () => {
     if (!token) return;
@@ -151,10 +148,7 @@ export default function Adopts() {
     };
   }, [fetchRecommendedPets, fetchAdoptionReqs, fetchMyAdoptionReqs]);
 
-
-  
   // Handlers
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -235,7 +229,10 @@ export default function Adopts() {
       if (selectedFile) {
         setUploading(true);
         try {
-          const uploadRes = await uploadPetImage(createdReq.pet.pet_id, selectedFile);
+          const uploadRes = await uploadPetImage(
+            createdReq.pet.pet_id,
+            selectedFile,
+          );
           createdReq.pet.images = [uploadRes.url];
         } catch (err) {
           console.error(err);
@@ -287,19 +284,25 @@ export default function Adopts() {
       const chatData = await res.json();
       const chatId = chatData.chatId;
 
-      const updateRes = await fetch(`${API_BASE}/adoption_reqs/${adoptionReqId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const updateRes = await fetch(
+        `${API_BASE}/adoption_reqs/${adoptionReqId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ chat_id: chatId }),
         },
-        body: JSON.stringify({ chat_id: chatId }),
-      });
+      );
 
       if (!updateRes.ok)
         throw new Error("Failed to update adoption request with chatId");
 
-      window.open(`/adoptions/${chatId}?adoptionReqId=${adoptionReqId}`, "_blank");
+      window.open(
+        `/adoptions/${chatId}?adoptionReqId=${adoptionReqId}`,
+        "_blank",
+      );
     } catch (err) {
       console.error(err);
       alert("Could not start chat: " + err.message);
@@ -309,9 +312,8 @@ export default function Adopts() {
   const safe = (obj, path, fallback) =>
     path.reduce((a, k) => (a && a[k] != null ? a[k] : fallback), obj);
 
-  
   // UI Rendering
-  
+
   return (
     <div className="relative">
       {pageLoading && <FullPageLoader />}
@@ -374,17 +376,29 @@ export default function Adopts() {
         </div>
       </section>
 
-
       {/* Recommended Pets */}
       {/* Shared Card Component Rendering */}
       <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
         <h1 className="text-slate-900 text-center text-2xl font-semibold py-5 border-b border-amber-200/60">
           AI Recommended Pets for You
         </h1>
-        {loadingRecs && (
-          <p className="text-center text-gray-600 mb-4">Refreshing recommendations...</p>
-        )}
         <div className="flex flex-wrap justify-center gap-6 p-6">
+          {loadingRecs &&
+            Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="w-80 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md"
+              >
+                <div className="h-56 animate-pulse bg-slate-200" />
+                <div className="space-y-3 p-5">
+                  <div className="h-5 w-2/3 animate-pulse rounded bg-slate-200" />
+                  <div className="h-4 w-1/2 animate-pulse rounded bg-slate-100" />
+                  <div className="h-4 w-full animate-pulse rounded bg-slate-100" />
+                  <div className="h-10 w-full animate-pulse rounded-full bg-orange-100" />
+                </div>
+              </div>
+            ))}
+
           {!loadingRecs && recommendedPets.length === 0 && (
             <div className="w-full max-w-2xl rounded-2xl border border-amber-200 bg-white/70 p-6 text-center shadow-sm">
               <p className="text-base font-semibold text-gray-800">
@@ -403,7 +417,7 @@ export default function Adopts() {
           )}
           {recommendedPets.map((pet) => {
             const req = adoptionReqs.find(
-              (r) => safe(r, ["pet", "pet_id"], null) === pet.pet_id
+              (r) => safe(r, ["pet", "pet_id"], null) === pet.pet_id,
             );
             if (!req) return null;
 
@@ -411,8 +425,8 @@ export default function Adopts() {
               req.status === "Completed"
                 ? "bg-green-100 text-green-700 border border-green-400"
                 : req.status === "Pending"
-                ? "bg-yellow-100 text-yellow-700 border border-yellow-400"
-                : "bg-blue-100 text-blue-700 border border-blue-400";
+                  ? "bg-yellow-100 text-yellow-700 border border-yellow-400"
+                  : "bg-blue-100 text-blue-700 border border-blue-400";
 
             return (
               <div
@@ -457,7 +471,8 @@ export default function Adopts() {
                       </span>
                     </h6>
                     <p className="text-sm text-gray-600">
-                      {req.pet.gender || "Unknown"} • {req.pet.age || 0} years old
+                      {req.pet.gender || "Unknown"} • {req.pet.age || 0} years
+                      old
                     </p>
 
                     {/* Pet Description */}
@@ -494,7 +509,6 @@ export default function Adopts() {
         </div>
       </section>
 
-
       {/* My Adoption Requests */}
       <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
         <h1 className="text-slate-900 text-center text-2xl font-semibold py-5 border-b border-amber-200/60">
@@ -523,8 +537,8 @@ export default function Adopts() {
                 req.status === "Completed"
                   ? "bg-green-100 text-green-700 border border-green-400"
                   : req.status === "Pending"
-                  ? "bg-yellow-100 text-yellow-700 border border-yellow-400"
-                  : "bg-blue-100 text-blue-700 border border-blue-400";
+                    ? "bg-yellow-100 text-yellow-700 border border-yellow-400"
+                    : "bg-blue-100 text-blue-700 border border-blue-400";
 
               return (
                 <div
@@ -570,7 +584,8 @@ export default function Adopts() {
                         </span>
                       </h6>
                       <p className="text-sm text-gray-600">
-                        {req.pet.gender || "Unknown"} • {req.pet.age || 0} years old
+                        {req.pet.gender || "Unknown"} • {req.pet.age || 0} years
+                        old
                       </p>
 
                       {req.pet.description && (
@@ -605,11 +620,6 @@ export default function Adopts() {
         </div>
       </section>
 
-
-
-
-
-
       {/* Meet Your Purr-fect Match */}
       <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
         <h1 className="text-slate-900 text-center text-2xl font-semibold py-5 border-b border-amber-200/60">
@@ -637,8 +647,8 @@ export default function Adopts() {
               req.status === "Completed"
                 ? "bg-green-100 text-green-700 border border-green-400"
                 : req.status === "Pending"
-                ? "bg-yellow-100 text-yellow-700 border border-yellow-400"
-                : "bg-blue-100 text-blue-700 border border-blue-400";
+                  ? "bg-yellow-100 text-yellow-700 border border-yellow-400"
+                  : "bg-blue-100 text-blue-700 border border-blue-400";
 
             return (
               <div
@@ -684,7 +694,8 @@ export default function Adopts() {
                       </span>
                     </h6>
                     <p className="text-sm text-gray-600">
-                      {req.pet.gender || "Unknown"} • {req.pet.age || 0} years old
+                      {req.pet.gender || "Unknown"} • {req.pet.age || 0} years
+                      old
                     </p>
 
                     {/* Pet Description */}
@@ -721,16 +732,33 @@ export default function Adopts() {
         </div>
       </section>
 
-
       {/* List for Adoption Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 text-black">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-8 relative overflow-y-auto max-h-[90vh]">
-            <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
-              List Your Pet for Adoption
-            </h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 text-black backdrop-blur-sm">
+          <div className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-white/70 bg-white shadow-2xl shadow-slate-950/25">
+            <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">
+                  Adoption listing
+                </p>
+                <h2 className="mt-1 text-2xl font-semibold text-slate-950">
+                  List Your Pet for Adoption
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                aria-label="Close adoption listing"
+              >
+                <X size={18} />
+              </button>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-6 overflow-y-auto px-6 py-5"
+            >
               {/* General Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -740,7 +768,7 @@ export default function Adopts() {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-green-500 outline-none"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                   rows="3"
                   placeholder="Describe the situation or reason for listing your pet..."
                 />
@@ -752,7 +780,7 @@ export default function Adopts() {
                   Pet Information
                 </h3>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-4 sm:grid-cols-2">
                   {/* Pet Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -763,7 +791,7 @@ export default function Adopts() {
                       value={formData.pet.name}
                       onChange={handleChange}
                       placeholder="Enter pet name"
-                      className="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-green-500 outline-none"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                       required
                     />
                   </div>
@@ -777,7 +805,7 @@ export default function Adopts() {
                       name="pet.species"
                       value={formData.pet.species}
                       onChange={handleChange}
-                      className="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-green-500 outline-none"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                     >
                       <option>Dog</option>
                       <option>Cat</option>
@@ -797,7 +825,7 @@ export default function Adopts() {
                       value={formData.pet.color}
                       onChange={handleChange}
                       placeholder="Enter pet color"
-                      className="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-green-500 outline-none"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                     />
                   </div>
 
@@ -812,7 +840,7 @@ export default function Adopts() {
                       value={formData.pet.age}
                       onChange={handleChange}
                       placeholder="e.g. 3"
-                      className="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-green-500 outline-none"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                     />
                   </div>
 
@@ -825,7 +853,7 @@ export default function Adopts() {
                       name="pet.gender"
                       value={formData.pet.gender}
                       onChange={handleChange}
-                      className="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-green-500 outline-none"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                     >
                       <option>Unknown</option>
                       <option>Male</option>
@@ -842,7 +870,7 @@ export default function Adopts() {
                       name="pet.size"
                       value={formData.pet.size}
                       onChange={handleChange}
-                      className="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-green-500 outline-none"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                     >
                       <option value="small">Small</option>
                       <option value="medium">Medium</option>
@@ -859,7 +887,7 @@ export default function Adopts() {
                       name="pet.temperament"
                       value={formData.pet.temperament}
                       onChange={handleChange}
-                      className="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-green-500 outline-none"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                     >
                       <option value="calm">Calm</option>
                       <option value="playful">Playful</option>
@@ -878,7 +906,7 @@ export default function Adopts() {
                       name="pet.activity_level"
                       value={formData.pet.activity_level}
                       onChange={handleChange}
-                      className="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-green-500 outline-none"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                     >
                       <option value="low">Low</option>
                       <option value="moderate">Moderate</option>
@@ -897,7 +925,7 @@ export default function Adopts() {
                     value={formData.pet.description}
                     onChange={handleChange}
                     placeholder="Write a brief description about your pet’s personality and needs..."
-                    className="border border-gray-300 rounded-lg p-3 w-full text-sm focus:ring-2 focus:ring-green-500 outline-none"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                     rows="3"
                   />
                 </div>
@@ -907,30 +935,38 @@ export default function Adopts() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Upload Pet Image
                   </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="w-full border border-gray-300 rounded-lg p-2 cursor-pointer bg-gray-50 focus:ring-2 focus:ring-green-500 outline-none"
-                  />
+                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600 transition hover:bg-white">
+                    <Upload size={18} className="text-emerald-600" />
+                    <span className="truncate">
+                      {selectedFile?.name || "Choose an image"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="sr-only"
+                    />
+                  </label>
                   {uploading && (
-                    <p className="text-sm text-gray-500 mt-2">Uploading image...</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Uploading image...
+                    </p>
                   )}
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-6 border-t mt-6">
+              <div className="sticky bottom-0 -mx-6 flex justify-end gap-3 border-t border-slate-100 bg-white px-6 pt-5">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-medium transition"
+                  className="rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-medium shadow-md transition"
+                  className="rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
                 >
                   Submit Listing
                 </button>
@@ -940,18 +976,31 @@ export default function Adopts() {
         </div>
       )}
 
-
-
-
-
-
       {/* Preferences Modal */}
       {userPrefs && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 text-black">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
-            <h2 className="text-xl font-semibold mb-4">Update My Preferences</h2>
-            <form onSubmit={handlePrefSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 text-black backdrop-blur-sm">
+          <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-white/70 bg-white shadow-2xl shadow-slate-950/25">
+            <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-500">
+                  Match settings
+                </p>
+                <h2 className="mt-1 flex items-center gap-2 text-xl font-semibold text-slate-950">
+                  <SlidersHorizontal size={20} /> Update My Preferences
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setUserPrefs(false)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                aria-label="Close preferences"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handlePrefSubmit} className="space-y-4 px-6 py-5">
+              <div className="grid gap-4 sm:grid-cols-2">
                 {/* Species */}
                 <div>
                   <label className="block text-sm font-medium">Species</label>
@@ -959,7 +1008,7 @@ export default function Adopts() {
                     name="preferred_species"
                     value={preferences.preferred_species}
                     onChange={handlePrefChange}
-                    className="border rounded-lg p-2 w-full"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
                   >
                     <option value="dog">Dog</option>
                     <option value="cat">Cat</option>
@@ -973,7 +1022,7 @@ export default function Adopts() {
                     name="preferred_size"
                     value={preferences.preferred_size}
                     onChange={handlePrefChange}
-                    className="border rounded-lg p-2 w-full"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
                   >
                     <option value="small">Small</option>
                     <option value="medium">Medium</option>
@@ -983,12 +1032,14 @@ export default function Adopts() {
                 </div>
                 {/* Temperament */}
                 <div>
-                  <label className="block text-sm font-medium">Temperament</label>
+                  <label className="block text-sm font-medium">
+                    Temperament
+                  </label>
                   <select
                     name="temperament"
                     value={preferences.temperament}
                     onChange={handlePrefChange}
-                    className="border rounded-lg p-2 w-full"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
                   >
                     <option value="calm">Calm</option>
                     <option value="playful">Playful</option>
@@ -1000,12 +1051,14 @@ export default function Adopts() {
                 </div>
                 {/* Activity Level */}
                 <div>
-                  <label className="block text-sm font-medium">Activity Level</label>
+                  <label className="block text-sm font-medium">
+                    Activity Level
+                  </label>
                   <select
                     name="activity_level"
                     value={preferences.activity_level}
                     onChange={handlePrefChange}
-                    className="border rounded-lg p-2 w-full"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
                   >
                     <option value="low">Low</option>
                     <option value="moderate">Moderate</option>
@@ -1015,14 +1068,14 @@ export default function Adopts() {
                 </div>
               </div>
 
-              <div className="flex gap-4">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <input
                   type="number"
                   name="min_age"
                   value={preferences.min_age}
                   onChange={handlePrefChange}
                   placeholder="Min Age"
-                  className="border rounded-lg p-2 w-full"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
                 />
                 <input
                   type="number"
@@ -1030,21 +1083,21 @@ export default function Adopts() {
                   value={preferences.max_age}
                   onChange={handlePrefChange}
                   placeholder="Max Age"
-                  className="border rounded-lg p-2 w-full"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 mt-4">
+              <div className="flex justify-end gap-3 border-t border-slate-100 pt-5">
                 <button
                   type="button"
                   onClick={() => setUserPrefs(false)}
-                  className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded-lg"
+                  className="rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg"
+                  className="rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
                 >
                   Save
                 </button>

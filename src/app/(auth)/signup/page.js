@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+const DEFAULT_AVATAR = "/images/default-avatar.png";
 
 export default function Signup() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function Signup() {
   });
 
   const [profilePhoto, setProfilePhoto] = useState(null);
-  const [preview, setPreview] = useState("https://avatar.iran.liara.run/public/11");
+  const [preview, setPreview] = useState(DEFAULT_AVATAR);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 

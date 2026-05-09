@@ -1,12 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback,useRef } from "react";
-import { UserSearch, Search } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { LocateFixed, MapIcon, Search, UserSearch, X } from "lucide-react";
 import LostCard from "../components/LostCard";
 import NearbyLostPets from "../components/NearbyLostPets";
-import FullPageLoader from "../components/FullPageLoader"; 
-import { GoogleMap, Marker, useJsApiLoader, Autocomplete } from "@react-google-maps/api";
-
+import FullPageLoader from "../components/FullPageLoader";
+import {
+  GoogleMap,
+  Marker,
+  useJsApiLoader,
+  Autocomplete,
+} from "@react-google-maps/api";
 
 export default function LostFound() {
   const [showModal, setShowModal] = useState(false);
@@ -29,27 +33,23 @@ export default function LostFound() {
   const [nearby, setNearby] = useState([]);
   const [radius, setRadius] = useState(10);
   const [loadingNearby, setLoadingNearby] = useState(true);
+  const [mapVisible, setMapVisible] = useState(false);
 
   const [pageLoading, setPageLoading] = useState(true);
-
-  
-
 
   const [mapCenter, setMapCenter] = useState({ lat: 6.9271, lng: 79.8612 }); // Default: Colombo
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL;
   const API_URL = `${API_BASE}/lost-found/`;
   const S3_UPLOAD_URL =
-  process.env.NEXT_PUBLIC_S3_UPLOAD_URL ||
-  `${API_BASE}/lost-found/upload-s3?folder=lost-found`;
+    process.env.NEXT_PUBLIC_S3_UPLOAD_URL ||
+    `${API_BASE}/lost-found/upload-s3?folder=lost-found`;
 
   const PLACEHOLDER_IMAGE =
     "https://via.placeholder.com/300x300?text=No+Image+Available";
 
   const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem("access_token")
-      : null;
+    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
   // Load Google Maps
   const { isLoaded } = useJsApiLoader({
@@ -61,10 +61,12 @@ export default function LostFound() {
   const getPlusCode = async (lat, lon) => {
     try {
       const res = await fetch(
-        `https://plus.codes/api?address=${lat},${lon}&email=noreply@demo.com`
+        `https://plus.codes/api?address=${lat},${lon}&email=noreply@demo.com`,
       );
       const data = await res.json();
-      return data?.plus_code?.global_code || `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+      return (
+        data?.plus_code?.global_code || `${lat.toFixed(5)}, ${lon.toFixed(5)}`
+      );
     } catch {
       return `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
     }
@@ -74,8 +76,6 @@ export default function LostFound() {
   const handleLocationChange = (e) => {
     setFormData({ ...formData, location: e.target.value });
   };
-
-
 
   const autocompleteRef = useRef(null);
 
@@ -127,8 +127,9 @@ export default function LostFound() {
           location: plusCode,
         }));
         setMapCenter({ lat: latitude, lng: longitude });
+        setMapVisible(true);
       },
-      () => setError("Unable to fetch current location.")
+      () => setError("Unable to fetch current location."),
     );
   }, []);
 
@@ -198,6 +199,7 @@ export default function LostFound() {
         file: null,
         status: "Lost",
       });
+      setMapVisible(false);
 
       setTimeout(() => setShowModal(false), 1200);
 
@@ -225,10 +227,9 @@ export default function LostFound() {
           setLoadingNearby(true);
           const res = await fetch(
             `${API_URL}nearby?lat=${latitude}&lon=${longitude}&radius_km=${radius}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           );
-          if (!res.ok)
-            throw new Error(`Failed to fetch nearby: ${res.status}`);
+          if (!res.ok) throw new Error(`Failed to fetch nearby: ${res.status}`);
           const data = await res.json();
           setNearby(Array.isArray(data) ? data : []);
         } catch (err) {
@@ -242,19 +243,19 @@ export default function LostFound() {
         console.error("Geolocation error:", err);
         setLoadingNearby(false);
       },
-      { enableHighAccuracy: true }
+      { enableHighAccuracy: true },
     );
   }, [API_URL, radius, token]);
 
   // Auto-fetch nearby pets when page loads
- 
+
   useEffect(() => {
     let cancelled = false;
 
     const run = async () => {
-      await fetchNearby();          // wait for first nearby fetch to finish
+      await fetchNearby(); // wait for first nearby fetch to finish
       if (!cancelled) {
-        setPageLoading(false);      // hide full-page loader
+        setPageLoading(false); // hide full-page loader
       }
     };
 
@@ -264,7 +265,6 @@ export default function LostFound() {
       cancelled = true;
     };
   }, [fetchNearby]);
-
 
   return (
     <div className="relative">
@@ -297,7 +297,8 @@ export default function LostFound() {
                 </h2>
 
                 <p className="text-slate-300 text-sm mt-2 max-w-xl">
-                  Join a community of animal lovers working together to reunite lost pets with their families.
+                  Join a community of animal lovers working together to reunite
+                  lost pets with their families.
                 </p>
 
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-5">
@@ -325,7 +326,6 @@ export default function LostFound() {
         </div>
       </section>
 
-
       {/* Nearby Lost Pets */}
       <NearbyLostPets pets={nearby} loading={loadingNearby} />
 
@@ -339,18 +339,30 @@ export default function LostFound() {
 
       {/* Report Lost Pet Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[95vh] overflow-y-auto p-6 relative text-black">
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-3 right-4 text-black hover:text-gray-700 text-2xl"
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+          <div className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-white/70 bg-white text-black shadow-2xl shadow-slate-950/25">
+            <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">
+                  Lost & found
+                </p>
+                <h2 className="mt-1 text-xl font-semibold text-slate-950">
+                  Report Lost Pet
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowModal(false)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                aria-label="Close lost pet report"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-4 overflow-y-auto px-6 py-5"
             >
-              &times;
-            </button>
-
-            <h2 className="text-xl font-semibold mb-4">Report Lost Pet</h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text"
                 placeholder="Pet Name"
@@ -358,7 +370,7 @@ export default function LostFound() {
                 onChange={(e) =>
                   setFormData({ ...formData, pet_name: e.target.value })
                 }
-                className="w-full border rounded px-3 py-2"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                 required
               />
 
@@ -368,7 +380,7 @@ export default function LostFound() {
                 onChange={(e) =>
                   setFormData({ ...formData, pet_type: e.target.value })
                 }
-                className="w-full border rounded px-3 py-2"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                 required
               >
                 <option value="Dog">Dog</option>
@@ -380,7 +392,7 @@ export default function LostFound() {
                 onChange={(e) =>
                   setFormData({ ...formData, gender: e.target.value })
                 }
-                className="w-full border rounded px-3 py-2"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
               >
                 <option value="Unknown">Unknown</option>
                 <option value="Male">Male</option>
@@ -393,7 +405,7 @@ export default function LostFound() {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                className="w-full border rounded px-3 py-2"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                 rows={3}
               />
 
@@ -409,13 +421,13 @@ export default function LostFound() {
                 />
                  */}
 
-                {isLoaded && (
-                  <div className="h-64 w-full border rounded-lg overflow-hidden">
+                {isLoaded && mapVisible && (
+                  <div className="h-64 w-full overflow-hidden rounded-xl border border-slate-200">
                     <GoogleMap
                       center={mapCenter}
                       zoom={10}
                       onClick={handleMapClick}
-                      mapContainerStyle={{ width: "100%", height: "100%"}}
+                      mapContainerStyle={{ width: "100%", height: "100%" }}
                     >
                       {formData.latitude && formData.longitude && (
                         <Marker
@@ -439,7 +451,7 @@ export default function LostFound() {
                       placeholder="Search location"
                       value={formData.location}
                       onChange={handleLocationChange}
-                      className="w-full border rounded px-3 py-2 mb-2"
+                      className="mt-3 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
                     />
                   </Autocomplete>
                 ) : (
@@ -448,19 +460,27 @@ export default function LostFound() {
                     placeholder="Loading Google..."
                     value={formData.location}
                     onChange={handleLocationChange}
-                    className="w-full border rounded px-3 py-2 mb-2"
+                    className="mt-3 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none"
                   />
                 )}
-                <div className="flex gap-3 mb-3">
+                <div className="mb-3 mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <button
                     type="button"
                     onClick={handleUseCurrentLocation}
-                    className="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
                   >
-                    Use Current Location
+                    <LocateFixed size={16} className="shrink-0" />
+                    <span>Use Current Location</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMapVisible((prev) => !prev)}
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
+                  >
+                    <MapIcon size={16} className="shrink-0" />
+                    <span>{mapVisible ? "Hide Map" : "Show Map"}</span>
                   </button>
                 </div>
-
 
                 {formData.latitude && formData.longitude && (
                   <p className="mt-2 text-sm text-gray-600">
@@ -479,19 +499,29 @@ export default function LostFound() {
                     file: e.target.files?.[0] || null,
                   })
                 }
-                className="w-full border rounded px-3 py-2"
+                className="w-full rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600"
               />
 
-              {error && <p className="text-red-600 text-sm">{error}</p>}
-              {success && <p className="text-green-600 text-sm">{success}</p>}
+              {error && (
+                <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                  {error}
+                </p>
+              )}
+              {success && (
+                <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                  {success}
+                </p>
+              )}
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded transition"
-              >
-                {submitting ? "Submitting..." : "Submit Report"}
-              </button>
+              <div className="sticky bottom-0 -mx-6 border-t border-slate-100 bg-white px-6 pt-4">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                >
+                  {submitting ? "Submitting..." : "Submit Report"}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -499,36 +529,54 @@ export default function LostFound() {
 
       {/* Nearby Radius Modal */}
       {showRadiusModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 text-black">
-          <div className="bg-white rounded-xl shadow-xl w-80 p-6">
-            <h3 className="text-lg font-semibold mb-4">Adjust Search Radius</h3>
-            <label className="block text-sm font-medium mb-2">
-              Radius (in km)
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="100"
-              value={radius}
-              onChange={(e) => setRadius(Number(e.target.value))}
-              className="w-full border rounded px-3 py-2 mb-4"
-            />
-            <div className="flex justify-end gap-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 text-black backdrop-blur-sm">
+          <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/70 bg-white shadow-2xl shadow-slate-950/25">
+            <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-500">
+                  Nearby pets
+                </p>
+                <h3 className="mt-1 flex items-center gap-2 text-lg font-semibold text-slate-950">
+                  <Search size={18} /> Adjust Search Radius
+                </h3>
+              </div>
               <button
                 onClick={() => setShowRadiusModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-400 transition"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                aria-label="Close radius search"
               >
-                Cancel
+                <X size={18} />
               </button>
-              <button
-                onClick={() => {
-                  setShowRadiusModal(false);
-                  fetchNearby();
-                }}
-                className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
-              >
-                Apply
-              </button>
+            </div>
+            <div className="px-6 py-5">
+              <label className="block text-sm font-medium mb-2">
+                Radius (in km)
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={radius}
+                onChange={(e) => setRadius(Number(e.target.value))}
+                className="mb-4 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
+              />
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowRadiusModal(false)}
+                  className="rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowRadiusModal(false);
+                    fetchNearby();
+                  }}
+                  className="rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
+                >
+                  Apply
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -53,7 +53,6 @@ export default function ChatPage() {
     if (!token) return;
 
     const payload = decodeJwt(token);
-    // console.log("JWT payload:", payload);
 
     const uid = payload?.id ?? payload?.user_id ?? payload?.sub;
     setCurrentUserId(uid ?? null);

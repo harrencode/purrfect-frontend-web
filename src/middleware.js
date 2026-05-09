@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 export function middleware(req) {
   const token = req.cookies.get("access_token")?.value;
+  const sessionActive = req.cookies.get("session_active")?.value;
   const { pathname } = req.nextUrl;
 
   // Allow access to sign in and public routes
@@ -18,7 +19,7 @@ export function middleware(req) {
   }
 
   // If no token, redirect to signin
-  if (!token) {
+  if (!token && !sessionActive) {
     return NextResponse.redirect(new URL("/signin", req.url));
   }
 

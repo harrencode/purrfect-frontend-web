@@ -4,8 +4,23 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import { clearAuthSession, refreshAuthSession } from "./lib/authSession";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
+function withAuthorizationHeader(args, accessToken) {
+  const [input, init = {}] = args;
+
+  if (input instanceof Request) {
+    const headers = new Headers(input.headers);
+    headers.set("Authorization", `Bearer ${accessToken}`);
+    return [new Request(input, { headers })];
+  }
+
+  const headers = new Headers(init.headers || {});
+  headers.set("Authorization", `Bearer ${accessToken}`);
+  return [input, { ...init, headers }];
+}
 
 export default function ClientLayoutWrapper({ children }) {
   const pathname = usePathname();
@@ -36,25 +51,30 @@ export default function ClientLayoutWrapper({ children }) {
 
     const originalFetch = window.fetch;
 
-    // Patch fetch globally: catch 401s while user is using the app
+    // Patch fetch globally: refresh once on 401 while user is using the app.
     window.fetch = async (...args) => {
       const res = await originalFetch(...args);
 
-      // Ignore auth endpoints entirely (token, verify, verify-code, resend-code)
+      // Ignore auth endpoints entirely (token, verify, verify-code, resend-code, refresh)
       const url = typeof args[0] === "string" ? args[0] : args[0]?.url || "";
       const isAuthCall = url.includes("/auth/");
 
       if (isAuthCall) return res;
 
+      if (res.status !== 401) return res;
+
+      const newAccessToken = await refreshAuthSession(originalFetch);
+      if (newAccessToken) {
+        return originalFetch(...withAuthorizationHeader(args, newAccessToken));
+      }
+
       if (
-        res.status === 401 &&
         !pathname?.startsWith("/signin") &&
         !pathname?.startsWith("/signup") &&
         !pathname?.startsWith("/verify-account")
       ) {
         setSessionExpired(true);
       }
-
       return res;
     };
 
@@ -86,6 +106,9 @@ export default function ClientLayoutWrapper({ children }) {
         });
 
         if (!res.ok) {
+          const refreshedToken = await refreshAuthSession(originalFetch);
+          if (refreshedToken) return;
+
           setSessionExpired(true);
         }
       } catch (err) {
@@ -102,9 +125,7 @@ export default function ClientLayoutWrapper({ children }) {
   }, [pathname]);
 
   const handleLoginClick = () => {
-    localStorage.removeItem("access_token");
-    document.cookie =
-      "access_token=; Max-Age=0; path=/; samesite=strict; secure";
+    clearAuthSession();
     router.push("/signin");
   };
 

@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import NotificationBell from './NotificationBell';
 import Image from "next/image";
+import { clearAuthSession } from '../lib/authSession';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
@@ -35,7 +36,7 @@ export default function Example() {
   const [profileImageError, setProfileImageError] = useState(false);
 
   const handleLogout = () => {
-    Cookies.remove('access_token', { path: '/' });
+    clearAuthSession();
     router.refresh();
     router.push('/signin');
   };

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { saveAuthSession } from "../../lib/authSession";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
@@ -94,8 +95,12 @@ export default function SignIn() {
 
 
       if (data?.access_token) {
-        localStorage.setItem("access_token", data.access_token);
-        document.cookie = `access_token=${data.access_token}; path=/; max-age=86400; samesite=strict`;
+        saveAuthSession(
+          data.access_token,
+          data.expires_in,
+          data.refresh_token,
+          data.refresh_expires_in,
+        );
         console.log("Login successful. Token stored.");
         router.push("/");
       } else {

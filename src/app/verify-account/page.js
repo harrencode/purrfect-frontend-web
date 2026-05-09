@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { saveAuthSession } from "../lib/authSession";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
@@ -53,8 +54,12 @@ function VerifyAccountInner() {
         return;
       }
 
-      localStorage.setItem("access_token", data.access_token);
-      document.cookie = `access_token=${data.access_token}; path=/; max-age=86400; samesite=strict`;
+      saveAuthSession(
+        data.access_token,
+        data.expires_in,
+        data.refresh_token,
+        data.refresh_expires_in,
+      );
 
       router.replace("/");
     } catch (err) {

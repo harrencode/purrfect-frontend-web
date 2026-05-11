@@ -5,6 +5,7 @@ import {
   PawPrint,
   ArrowRight,
 } from "lucide-react";
+import Image from "next/image";
 import SectionHeading from "../components/SectionHeading";
 
 export default function AboutUs() {
@@ -20,12 +21,24 @@ export default function AboutUs() {
         <div className="flex flex-col items-center gap-8 md:flex-row md:items-start">
           {/* Left: Text */}
           <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left space-y-4">
-            <SectionHeading
-              eyebrow="About Purrfect"
-              title="A kinder platform for every rescue story."
-              align="center"
-              className="mb-0 md:items-start md:text-left"
-            />
+            {/* Logo with Heading - Better alignment */}
+            <div className="flex items-start gap-4 md:gap-6 w-full md:justify-start justify-center">
+              <Image
+                alt="purrfect logo"
+                src="/images/purrfect%20logo.png"
+                width={100}
+                height={100}
+                className="h-16 w-auto object-contain flex-shrink-0 mt-1"
+              />
+              <div className="flex flex-col">
+                <SectionHeading
+                  eyebrow="About Purrfect"
+                  title="A kinder platform for every rescue story."
+                  align="left"
+                  className="mb-0"
+                />
+              </div>
+            </div>
 
             <p className="text-sm md:text-base leading-relaxed text-slate-700 max-w-xl">
               Purrfect brings rescuers, volunteers, and shelters together in one

@@ -709,10 +709,10 @@ export default function Adopts() {
 
                 {/* Pet Info */}
                 <div className="p-5 flex flex-col justify-between flex-1">
-                  <div
-                    key={req.id}
-                    className="group relative flex w-full max-w-sm flex-col overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md transition duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-2xl"
-                  >
+                  <div>
+                    <h6 className="text-lg font-semibold text-gray-800 mb-1 flex items-center gap-1">
+                      {req.pet.name || "Unknown"}{" "}
+                      <span className="text-sm text-gray-400">
                         ({req.pet.species || "Pet"})
                       </span>
                     </h6>

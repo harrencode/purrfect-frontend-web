@@ -6,7 +6,7 @@ import { Facebook, MessageCircle } from "lucide-react";
 export default function Footer() {
   return (
     <footer className="bg-black text-white w-full py-6 px-4 md:px-16">
-      <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-6 md:gap-0">
+      <div className="flex flex-col items-center justify-between gap-8 text-center md:flex-row md:items-start md:gap-0 md:text-left">
 
         {/* Left Section */}
         <div className="text-center md:text-left">
@@ -15,7 +15,7 @@ export default function Footer() {
         </div>
 
         {/* Middle Links */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-2 text-center md:text-left">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-2 text-center sm:grid-cols-2 sm:gap-y-3 md:grid-cols-3 md:text-left">
           <Link href="/rescues" className="hover:text-gray-300">Rescue Section</Link>
           <Link href="/map" className="hover:text-gray-300">Stray Map</Link>
           <Link href="/store" className="hover:text-gray-300">Store</Link>

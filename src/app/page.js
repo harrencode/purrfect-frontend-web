@@ -336,8 +336,8 @@ export default function Home() {
 
       {/* Main Navigation Cards */}
       <section className="py-10 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 justify-items-center">
             {[
               { icon: PawPrint, text: "Report a Rescue", link: "/rescues" },
               { icon: HeartHandshake, text: "Adopt a Pet", link: "/adoptions" },
@@ -365,7 +365,7 @@ export default function Home() {
       {/* EVERYTHING BELOW HERE IS UNCHANGED UNTIL ALERTS SECTION*/}
 
       <section className="bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
-        <div className="px-6 pt-8">
+        <div className="px-4 sm:px-6 lg:px-8 pt-8">
           <SectionHeading
             eyebrow="AI matches"
             title="AI Recommended Pets for You"
@@ -373,12 +373,12 @@ export default function Home() {
           />
         </div>
 
-        <div className="flex flex-wrap justify-center gap-6 p-6">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 p-4 sm:p-6">
           {loadingRecs &&
             Array.from({ length: 4 }).map((_, index) => (
               <div
                 key={index}
-                className="w-80 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md"
+                className="w-full max-w-sm overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md"
               >
                 <div className="h-56 animate-pulse bg-slate-200" />
                 <div className="space-y-3 p-5">
@@ -423,7 +423,7 @@ export default function Home() {
             return (
               <div
                 key={req.id}
-                className="group relative flex flex-col bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-2xl border border-gray-200 rounded-2xl w-80 transition transform hover:-translate-y-1 hover:scale-[1.02] duration-300 overflow-hidden"
+                className="group relative flex w-full max-w-sm flex-col overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md transition duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-2xl"
               >
                 {/* Pet Image */}
                 <div className="relative h-56 overflow-hidden">
@@ -487,10 +487,10 @@ export default function Home() {
       </section>
 
       {/* Map & Alerts */}
-      <section className="px-10 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
-        <div className="flex flex-row w-full h-[80vh]">
+      <section className="px-4 sm:px-6 lg:px-10 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
+        <div className="flex w-full min-h-[80vh] flex-col gap-6 lg:flex-row lg:gap-0">
           {/* Map */}
-          <div className="basis-1/2 p-4">
+          <div className="w-full min-w-0 p-4 lg:basis-1/2">
             <SectionHeading
               eyebrow="Live map"
               title="Purr-fect Stray Locator"
@@ -505,7 +505,7 @@ export default function Home() {
 
           {/* Alerts – now powered by nearby rescue missions */}
 
-          <div className="basis-1/2 p-4 flex flex-col">
+          <div className="flex w-full min-w-0 flex-col p-4 lg:basis-1/2">
             <SectionHeading
               eyebrow="Nearby alerts"
               title="Rescue Alerts Near You"
@@ -516,7 +516,7 @@ export default function Home() {
 
             {/* only this part scrolls */}
             {/* <div className="flex-1 overflow-y-auto"> */}
-            <div className="overflow-y-auto" style={{ height: "400px" }}>
+            <div className="overflow-y-auto" style={{ height: "300px", minHeight: "300px" }}>
               {nearbyLoading && (
                 <div className="space-y-4">
                   {Array.from({ length: 3 }).map((_, index) => (

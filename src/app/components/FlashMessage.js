@@ -25,7 +25,7 @@ export default function FlashMessage({
     <div
       role="status"
       aria-live="polite"
-      className={`fixed right-4 top-20 z-[60] flex max-w-sm items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold shadow-lg ${
+      className={`fixed left-4 right-4 top-20 z-[60] flex max-w-sm items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold shadow-lg sm:left-auto sm:right-4 ${
         isSuccess
           ? "border-emerald-100 bg-emerald-50 text-emerald-800"
           : "border-red-100 bg-red-50 text-red-700"

@@ -21,7 +21,7 @@ export default function NearbyLostPets({ pets, loading }) {
   };
 
   return (
-    <section className="py-10 px-10 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
+    <section className="py-10 px-4 sm:px-6 lg:px-10 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
       <SectionHeading
         eyebrow="Nearby reports"
         title="Missing Paws Near You"

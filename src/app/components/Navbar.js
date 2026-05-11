@@ -137,25 +137,36 @@ export default function Example() {
       as="nav"
       className="relative bg-gray-800 dark:bg-gray-100/50 dark:after:pointer-events-none dark:after:absolute dark:after:inset-x-0 dark:after:bottom-0 dark:after:h-px dark:after:bg-white/10"
     >
-      <div className="mx-10 max-w-7x2 px-2 sm:px-6 lg:px-8">
-        <div className="relative flex h-16 items-center justify-between">
-          <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+      <div className="mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div className="relative flex h-16 items-center sm:justify-between">
+          <div className="relative z-20 flex w-full items-center sm:hidden">
             {/* Mobile menu button*/}
-            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-white/5 hover:text-white focus:outline-2 focus:-outline-offset-1 focus:outline-indigo-500">
+            <DisclosureButton className="group relative inline-flex flex-shrink-0 items-center justify-center rounded-md p-1.5 text-gray-400 hover:bg-white/5 hover:text-white focus:outline-2 focus:-outline-offset-1 focus:outline-indigo-500">
               <span className="absolute -inset-0.5" />
               <span className="sr-only">Open main menu</span>
-              <Bars3Icon aria-hidden="true" className="block size-6 group-data-open:hidden" />
-              <XMarkIcon aria-hidden="true" className="hidden size-6 group-data-open:block" />
+              <Bars3Icon aria-hidden="true" className="block size-5 group-data-open:hidden" />
+              <XMarkIcon aria-hidden="true" className="hidden size-5 group-data-open:block" />
             </DisclosureButton>
+            {/* Mobile logo - centered */}
+            <div className="flex flex-1 justify-center">
+              <Image
+                alt="purr-fect"
+                src="/images/purrfect%20logo.png"
+                width={80}
+                height={28}
+                className="h-7 w-auto object-contain"
+              />
+            </div>
           </div>
-          <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-            <div className="flex shrink-0 items-center">
+          <div className="pointer-events-none absolute inset-x-0 hidden justify-center sm:pointer-events-auto sm:static sm:flex sm:flex-1 sm:items-center sm:justify-start">
+            <div className="flex min-w-0 items-center justify-center overflow-hidden sm:overflow-visible">
+              {/* Desktop logo */}
               <Image
                 alt="purr-fect"
                 src="/images/Purr-Fect.png"
                 width={80}
                 height={20}
-                className="h-5 w-auto"
+                className="h-5 w-auto max-w-[96px] object-contain sm:max-w-none"
               />
             </div>
             <div className="hidden justify-center m-auto sm:block">
@@ -178,19 +189,22 @@ export default function Example() {
               </div>
             </div>
           </div>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-            <NotificationBell />
+          <div className="relative z-20 ml-auto flex items-center gap-2 sm:gap-3">
+            <div className="shrink-0 flex-shrink-0">
+              <NotificationBell />
+            </div>
 
             {/* Profile dropdown */}
-            <Menu as="div" className="relative ml-3">
-              <MenuButton className="relative flex rounded-full">
+            <Menu as="div" className="relative ml-0 sm:ml-3 shrink-0 flex-shrink-0">
+              <MenuButton className="relative flex rounded-full flex-shrink-0">
                 <Image
                   alt="User profile"
                   src={profileImage}
-                  width={32}
-                  height={32}
+                  width={40}
+                  height={40}
+                  priority
                   onError={() => setProfileImageError(true)}
-                  className="size-8 rounded-full bg-gray-800 outline -outline-offset-1 outline-white/10 object-cover"
+                  className="size-8 sm:size-9 rounded-full bg-gray-800 outline -outline-offset-1 outline-white/10 object-cover flex-shrink-0"
                 />
               </MenuButton>
 
@@ -221,7 +235,7 @@ export default function Example() {
       </div>
 
       <DisclosurePanel className="sm:hidden">
-        <div className="space-y-1 px-2 pt-2 pb-3">
+        <div className="space-y-1 border-t border-white/10 px-3 py-3">
           {navigation.map((item) => (
             <DisclosureButton
               key={item.name}

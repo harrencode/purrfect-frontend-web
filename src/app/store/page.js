@@ -103,7 +103,7 @@ export default function Shop() {
         )}
 
         {/* Product Grid */}
-        <section className="m-auto px-10 py-12 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
+        <section className="m-auto px-4 py-12 sm:px-6 lg:px-10 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-200">
           <ItemCard
             onInitialLoadComplete={handleInitialProductsLoad}
             refreshKey={productsRefreshKey}

@@ -26,7 +26,7 @@ export default function Notifications({ wsUrl }) {
   if (!notifications.length) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 w-80 z-50">
+    <div className="fixed bottom-4 left-4 right-4 z-50 sm:left-auto sm:w-80 sm:right-4">
       {notifications.map((n, idx) => (
         <div key={idx} className="bg-white p-3 rounded shadow mb-2">
           <div className="text-sm font-semibold">{n.from || "System"}</div>

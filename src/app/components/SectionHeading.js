@@ -43,7 +43,7 @@ export default function SectionHeading({
               >
                 <Info size={15} />
               </button>
-              <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-64 -translate-x-1/2 rounded-lg border border-slate-100 bg-white px-3 py-2 text-left text-xs font-medium leading-5 text-slate-600 opacity-0 shadow-lg transition group-hover:opacity-100 group-focus-within:opacity-100">
+              <span className="pointer-events-none absolute left-0 top-full z-20 mt-2 w-[min(16rem,calc(100vw-2rem))] rounded-lg border border-slate-100 bg-white px-3 py-2 text-left text-xs font-medium leading-5 text-slate-600 opacity-0 shadow-lg transition sm:left-1/2 sm:-translate-x-1/2 group-hover:opacity-100 group-focus-within:opacity-100">
                 {description}
               </span>
             </span>
